@@ -23,10 +23,11 @@ import org.slf4j.LoggerFactory;
 import com.sap.xsk.hdb.ds.model.hdbschema.XSKDataStructureHDBSchemaModel;
 
 public class HDBSchemaDropProcessor extends AbstractXSKProcessor<XSKDataStructureHDBSchemaModel> {
-    private static final Logger logger = LoggerFactory.getLogger(HDBSchemaDropProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(HDBSchemaDropProcessor.class);
 
-    public void execute(Connection connection, XSKDataStructureHDBSchemaModel hdbSchema) throws SQLException {
-        String sql = "DROP SCHEMA " + hdbSchema.getName();
-        executeSql(sql, connection);
-    }
+  public void execute(Connection connection, XSKDataStructureHDBSchemaModel hdbSchema)
+      throws SQLException {
+    String sql = "DROP SCHEMA " + hdbSchema.getName();
+    executeSql(sql, connection);
+  }
 }

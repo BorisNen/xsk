@@ -11,9 +11,6 @@
  */
 package com.sap.xsk.hdb.ds.model.hdbtable;
 
-/**
- * The Data Structure Table Constraint Unique Model.
- */
-public class XSKDataStructureHDBTableConstraintUniqueModel extends XSKDataStructureHDBTableConstraintModel {
-
-}
+/** The Data Structure Table Constraint Unique Model. */
+public class XSKDataStructureHDBTableConstraintUniqueModel
+    extends XSKDataStructureHDBTableConstraintModel {}

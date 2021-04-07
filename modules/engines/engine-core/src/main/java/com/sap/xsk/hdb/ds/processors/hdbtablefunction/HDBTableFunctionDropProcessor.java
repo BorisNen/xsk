@@ -26,20 +26,25 @@ import java.sql.SQLException;
 
 import static java.text.MessageFormat.format;
 
-public class HDBTableFunctionDropProcessor extends AbstractXSKProcessor<XSKDataStructureHDBTableFunctionModel> {
+public class HDBTableFunctionDropProcessor
+    extends AbstractXSKProcessor<XSKDataStructureHDBTableFunctionModel> {
 
-    private static final Logger logger = LoggerFactory.getLogger(HDBTableFunctionDropProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(HDBTableFunctionDropProcessor.class);
 
-    public void execute(Connection connection, XSKDataStructureHDBTableFunctionModel hdbTableFunction) throws SQLException {
-        logger.info("Processing Drop TableFunction: " + hdbTableFunction.getName());
+  public void execute(Connection connection, XSKDataStructureHDBTableFunctionModel hdbTableFunction)
+      throws SQLException {
+    logger.info("Processing Drop TableFunction: " + hdbTableFunction.getName());
 
-        String tableFunctionName = XSKUtils.escapeArtifactName(hdbTableFunction.getName());
-        if (SqlFactory.getNative(connection).exists(connection, tableFunctionName, DatabaseArtifactTypes.FUNCTION)) {
-            String sql = XSKConstants.XSK_HDBTABLEFUNCTION_DROP + hdbTableFunction.getName();
-            executeSql(sql, connection);
-        } else {
-            logger.warn(format("TableFunction [{0}] already exists during the drop process", hdbTableFunction.getName()));
-        }
+    String tableFunctionName = XSKUtils.escapeArtifactName(hdbTableFunction.getName());
+    if (SqlFactory.getNative(connection)
+        .exists(connection, tableFunctionName, DatabaseArtifactTypes.FUNCTION)) {
+      String sql = XSKConstants.XSK_HDBTABLEFUNCTION_DROP + hdbTableFunction.getName();
+      executeSql(sql, connection);
+    } else {
+      logger.warn(
+          format(
+              "TableFunction [{0}] already exists during the drop process",
+              hdbTableFunction.getName()));
     }
-
+  }
 }

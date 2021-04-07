@@ -28,79 +28,91 @@ import static org.junit.Assert.fail;
 
 public class XSKHDBSYNONYMCoreListenerTest {
 
-    private ANTLRInputStream inputStream;
+  private ANTLRInputStream inputStream;
 
-    @Test
-    public void parse_hdbsynonymModel_successfully() {
-        String sample = "";
-        try {
-            sample = org.apache.commons.io.IOUtils.toString(XSKHDBSYNONYMCoreListenerTest.class.getResourceAsStream("/sample.hdbsynonym"), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            fail("Parsing of sample.hdbsynonym failed.");
-            e.printStackTrace();
-        }
-        ANTLRInputStream inputStream = new ANTLRInputStream(sample);
-        HdbsynonymLexer HdbsynonymLexer = new HdbsynonymLexer(inputStream);
-        CommonTokenStream tokenStream = new CommonTokenStream(HdbsynonymLexer);
-        HdbsynonymParser hdbsynonymParser = new HdbsynonymParser(tokenStream);
-        hdbsynonymParser.setBuildParseTree(true);
-        ParseTree parseTree = hdbsynonymParser.hdbsynonymDefinition();
-
-        XSKHDBSYNONYMCoreListener hdbsynonymCoreListener = new XSKHDBSYNONYMCoreListener();
-        ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
-        parseTreeWalker.walk(hdbsynonymCoreListener, parseTree);
-
-        XSKHDBSYNONYMDefinitionModel model = hdbsynonymCoreListener.getModel();
-        Assert.assertNotNull(model);
-        Assert.assertEquals("No Syntax errors are found", 0, hdbsynonymParser.getNumberOfSyntaxErrors());
+  @Test
+  public void parse_hdbsynonymModel_successfully() {
+    String sample = "";
+    try {
+      sample =
+          org.apache.commons.io.IOUtils.toString(
+              XSKHDBSYNONYMCoreListenerTest.class.getResourceAsStream("/sample.hdbsynonym"),
+              StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      fail("Parsing of sample.hdbsynonym failed.");
+      e.printStackTrace();
     }
+    ANTLRInputStream inputStream = new ANTLRInputStream(sample);
+    HdbsynonymLexer HdbsynonymLexer = new HdbsynonymLexer(inputStream);
+    CommonTokenStream tokenStream = new CommonTokenStream(HdbsynonymLexer);
+    HdbsynonymParser hdbsynonymParser = new HdbsynonymParser(tokenStream);
+    hdbsynonymParser.setBuildParseTree(true);
+    ParseTree parseTree = hdbsynonymParser.hdbsynonymDefinition();
 
-    @Test
-    public void parse_hdbsynonymModel_with_diff_target_positions_successfully() {
-        String sample = "";
-        try {
-            sample = org.apache.commons.io.IOUtils.toString(XSKHDBSYNONYMCoreListenerTest.class.getResourceAsStream("/sample2.hdbsynonym"), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            fail("Parsing of sample.hdbsynonym failed.");
-            e.printStackTrace();
-        }
-        ANTLRInputStream inputStream = new ANTLRInputStream(sample);
-        HdbsynonymLexer HdbsynonymLexer = new HdbsynonymLexer(inputStream);
-        CommonTokenStream tokenStream = new CommonTokenStream(HdbsynonymLexer);
-        HdbsynonymParser hdbsynonymParser = new HdbsynonymParser(tokenStream);
-        hdbsynonymParser.setBuildParseTree(true);
-        ParseTree parseTree = hdbsynonymParser.hdbsynonymDefinition();
+    XSKHDBSYNONYMCoreListener hdbsynonymCoreListener = new XSKHDBSYNONYMCoreListener();
+    ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
+    parseTreeWalker.walk(hdbsynonymCoreListener, parseTree);
 
-        XSKHDBSYNONYMCoreListener hdbsynonymCoreListener = new XSKHDBSYNONYMCoreListener();
-        ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
-        parseTreeWalker.walk(hdbsynonymCoreListener, parseTree);
+    XSKHDBSYNONYMDefinitionModel model = hdbsynonymCoreListener.getModel();
+    Assert.assertNotNull(model);
+    Assert.assertEquals(
+        "No Syntax errors are found", 0, hdbsynonymParser.getNumberOfSyntaxErrors());
+  }
 
-        XSKHDBSYNONYMDefinitionModel model = hdbsynonymCoreListener.getModel();
-        Assert.assertNotNull(model);
-        Assert.assertEquals("No Syntax errors are found", 0, hdbsynonymParser.getNumberOfSyntaxErrors());
+  @Test
+  public void parse_hdbsynonymModel_with_diff_target_positions_successfully() {
+    String sample = "";
+    try {
+      sample =
+          org.apache.commons.io.IOUtils.toString(
+              XSKHDBSYNONYMCoreListenerTest.class.getResourceAsStream("/sample2.hdbsynonym"),
+              StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      fail("Parsing of sample.hdbsynonym failed.");
+      e.printStackTrace();
     }
+    ANTLRInputStream inputStream = new ANTLRInputStream(sample);
+    HdbsynonymLexer HdbsynonymLexer = new HdbsynonymLexer(inputStream);
+    CommonTokenStream tokenStream = new CommonTokenStream(HdbsynonymLexer);
+    HdbsynonymParser hdbsynonymParser = new HdbsynonymParser(tokenStream);
+    hdbsynonymParser.setBuildParseTree(true);
+    ParseTree parseTree = hdbsynonymParser.hdbsynonymDefinition();
 
-    @Test
-    public void parse_hdbsynonymModel_exceptionThrown() {
-        String sample = "";
-        try {
-            sample = org.apache.commons.io.IOUtils.toString(XSKHDBSYNONYMCoreListenerTest.class.getResourceAsStream("/sample_with_errors.hdbsynonym"), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            fail("Parsing of sample_with_errors.hdbsynonym failed.");
-            e.printStackTrace();
-        }
-        ANTLRInputStream inputStream = new ANTLRInputStream(sample);
-        HdbsynonymLexer HdbsynonymLexer = new HdbsynonymLexer(inputStream);
-        CommonTokenStream tokenStream = new CommonTokenStream(HdbsynonymLexer);
-        HdbsynonymParser hdbsynonymParser = new HdbsynonymParser(tokenStream);
-        hdbsynonymParser.setBuildParseTree(true);
-        ParseTree parseTree = hdbsynonymParser.hdbsynonymDefinition();
+    XSKHDBSYNONYMCoreListener hdbsynonymCoreListener = new XSKHDBSYNONYMCoreListener();
+    ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
+    parseTreeWalker.walk(hdbsynonymCoreListener, parseTree);
 
-        XSKHDBSYNONYMCoreListener hdbsynonymCoreListener = new XSKHDBSYNONYMCoreListener();
-        ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
-        parseTreeWalker.walk(hdbsynonymCoreListener, parseTree);
+    XSKHDBSYNONYMDefinitionModel model = hdbsynonymCoreListener.getModel();
+    Assert.assertNotNull(model);
+    Assert.assertEquals(
+        "No Syntax errors are found", 0, hdbsynonymParser.getNumberOfSyntaxErrors());
+  }
 
-        XSKHDBSYNONYMDefinitionModel model = hdbsynonymCoreListener.getModel();
-        Assert.assertEquals("Found 1 Syntax error", 1, hdbsynonymParser.getNumberOfSyntaxErrors());
+  @Test
+  public void parse_hdbsynonymModel_exceptionThrown() {
+    String sample = "";
+    try {
+      sample =
+          org.apache.commons.io.IOUtils.toString(
+              XSKHDBSYNONYMCoreListenerTest.class.getResourceAsStream(
+                  "/sample_with_errors.hdbsynonym"),
+              StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      fail("Parsing of sample_with_errors.hdbsynonym failed.");
+      e.printStackTrace();
     }
+    ANTLRInputStream inputStream = new ANTLRInputStream(sample);
+    HdbsynonymLexer HdbsynonymLexer = new HdbsynonymLexer(inputStream);
+    CommonTokenStream tokenStream = new CommonTokenStream(HdbsynonymLexer);
+    HdbsynonymParser hdbsynonymParser = new HdbsynonymParser(tokenStream);
+    hdbsynonymParser.setBuildParseTree(true);
+    ParseTree parseTree = hdbsynonymParser.hdbsynonymDefinition();
+
+    XSKHDBSYNONYMCoreListener hdbsynonymCoreListener = new XSKHDBSYNONYMCoreListener();
+    ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
+    parseTreeWalker.walk(hdbsynonymCoreListener, parseTree);
+
+    XSKHDBSYNONYMDefinitionModel model = hdbsynonymCoreListener.getModel();
+    Assert.assertEquals("Found 1 Syntax error", 1, hdbsynonymParser.getNumberOfSyntaxErrors());
+  }
 }

@@ -26,18 +26,23 @@ import java.sql.SQLException;
 
 import static java.text.MessageFormat.format;
 
-public class HDBProcedureCreateProcessor extends AbstractXSKProcessor<XSKDataStructureHDBProcedureModel> {
-    private static final Logger logger = LoggerFactory.getLogger(HDBProcedureCreateProcessor.class);
+public class HDBProcedureCreateProcessor
+    extends AbstractXSKProcessor<XSKDataStructureHDBProcedureModel> {
+  private static final Logger logger = LoggerFactory.getLogger(HDBProcedureCreateProcessor.class);
 
-    public void execute(Connection connection, XSKDataStructureHDBProcedureModel hdbProcedure) throws SQLException {
-        logger.info("Processing Create Procedure: " + hdbProcedure.getName());
+  public void execute(Connection connection, XSKDataStructureHDBProcedureModel hdbProcedure)
+      throws SQLException {
+    logger.info("Processing Create Procedure: " + hdbProcedure.getName());
 
-        String procedureName = XSKUtils.escapeArtifactName(hdbProcedure.getName());
-        if (!SqlFactory.getNative(connection).exists(connection, procedureName, DatabaseArtifactTypes.PROCEDURE)) {
-            String sql = XSKConstants.XSK_HDBPROCEDURE_CREATE + hdbProcedure.getContent();
-            executeSql(sql, connection);
-        } else {
-            logger.warn(format("Procedure [{0}] already exists during the create process", hdbProcedure.getName()));
-        }
+    String procedureName = XSKUtils.escapeArtifactName(hdbProcedure.getName());
+    if (!SqlFactory.getNative(connection)
+        .exists(connection, procedureName, DatabaseArtifactTypes.PROCEDURE)) {
+      String sql = XSKConstants.XSK_HDBPROCEDURE_CREATE + hdbProcedure.getContent();
+      executeSql(sql, connection);
+    } else {
+      logger.warn(
+          format(
+              "Procedure [{0}] already exists during the create process", hdbProcedure.getName()));
     }
+  }
 }

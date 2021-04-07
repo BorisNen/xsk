@@ -21,17 +21,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+public abstract class AbstractXSKProcessor<T extends XSKDataStructureModel>
+    implements IXSKHdbProcessor<T> {
+  private static final Logger logger = LoggerFactory.getLogger(XSKHDBCoreFacade.class);
 
-public abstract class AbstractXSKProcessor<T extends XSKDataStructureModel> implements IXSKHdbProcessor<T> {
-    private static final Logger logger = LoggerFactory.getLogger(XSKHDBCoreFacade.class);
-
-    public void executeSql(String sql, Connection connection) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            logger.info(sql);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            logger.error(sql);
-            logger.error(e.getMessage(), e);
-        }
+  public void executeSql(String sql, Connection connection) throws SQLException {
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      logger.info(sql);
+      statement.executeUpdate();
+    } catch (SQLException e) {
+      logger.error(sql);
+      logger.error(e.getMessage(), e);
     }
+  }
 }

@@ -29,78 +29,80 @@ import org.slf4j.LoggerFactory;
 import com.sap.xsk.hdb.ds.model.hdbtable.XSKDataStructureHDBTableConstraintForeignKeyModel;
 import com.sap.xsk.hdb.ds.model.hdbtable.XSKDataStructureHDBTableModel;
 
-/**
- * The Table Drop Processor.
- */
+/** The Table Drop Processor. */
 public class XSKTableDropProcessor extends AbstractXSKProcessor<XSKDataStructureHDBTableModel> {
 
-	private static final Logger logger = LoggerFactory.getLogger(XSKTableDropProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(XSKTableDropProcessor.class);
 
-	/**
-	 * Execute the corresponding statement.
-	 *
-	 * @param connection
-	 *            the connection
-	 * @param tableModel
-	 *            the table model
-	 * @throws SQLException
-	 *             the SQL exception
-	 */
-	public void execute(Connection connection, XSKDataStructureHDBTableModel tableModel) throws SQLException {
-		String tableName = XSKUtils.escapeArtifactName(tableModel.getName());
-		logger.info("Processing Drop Table: " + tableName);
-		if (SqlFactory.getNative(connection).exists(connection, tableName)) {
-			String sql = SqlFactory.getNative(connection).select().column("COUNT(*)").from(tableName)
-					.build();
-			PreparedStatement statement = null;
-			try {
-				statement = connection.prepareStatement(sql);
-				logger.info(sql);
-				ResultSet resultSet = statement.executeQuery();
-				if (resultSet.next()) {
-					int count = resultSet.getInt(1);
-					if (count > 0) {
-						logger.error(
-								format("Drop operation for the non empty Table [{0}] will not be executed. Delete all the records in the table first.",
-										tableName));
-						return;
-					}
-				}
-			} catch (SQLException e) {
-				logger.error(sql);
-				logger.error(e.getMessage(), e);
-			} finally {
-				if (statement != null) {
-					statement.close();
-				}
-			}
-			
-			if (tableModel.getConstraints().getForeignKeys() != null) {
-				for (XSKDataStructureHDBTableConstraintForeignKeyModel foreignKeyModel : tableModel.getConstraints().getForeignKeys()) {
-					sql = SqlFactory.getNative(connection).drop().constraint(foreignKeyModel.getName()).fromTable(tableName).build();
-					executeUpdate(connection, sql);
-				}
-			}
+  /**
+   * Execute the corresponding statement.
+   *
+   * @param connection the connection
+   * @param tableModel the table model
+   * @throws SQLException the SQL exception
+   */
+  public void execute(Connection connection, XSKDataStructureHDBTableModel tableModel)
+      throws SQLException {
+    String tableName = XSKUtils.escapeArtifactName(tableModel.getName());
+    logger.info("Processing Drop Table: " + tableName);
+    if (SqlFactory.getNative(connection).exists(connection, tableName)) {
+      String sql =
+          SqlFactory.getNative(connection).select().column("COUNT(*)").from(tableName).build();
+      PreparedStatement statement = null;
+      try {
+        statement = connection.prepareStatement(sql);
+        logger.info(sql);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+          int count = resultSet.getInt(1);
+          if (count > 0) {
+            logger.error(
+                format(
+                    "Drop operation for the non empty Table [{0}] will not be executed. Delete all the records in the table first.",
+                    tableName));
+            return;
+          }
+        }
+      } catch (SQLException e) {
+        logger.error(sql);
+        logger.error(e.getMessage(), e);
+      } finally {
+        if (statement != null) {
+          statement.close();
+        }
+      }
 
-			sql = SqlFactory.getNative(connection).drop().table(tableName).build();
-			executeUpdate(connection, sql);
-		}
-	}
+      if (tableModel.getConstraints().getForeignKeys() != null) {
+        for (XSKDataStructureHDBTableConstraintForeignKeyModel foreignKeyModel :
+            tableModel.getConstraints().getForeignKeys()) {
+          sql =
+              SqlFactory.getNative(connection)
+                  .drop()
+                  .constraint(foreignKeyModel.getName())
+                  .fromTable(tableName)
+                  .build();
+          executeUpdate(connection, sql);
+        }
+      }
 
-	private void executeUpdate(Connection connection, String sql) throws SQLException {
-		PreparedStatement statement = null;
-		try {
-			statement = connection.prepareStatement(sql);
-			logger.info(sql);
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			logger.error(sql);
-			logger.error(e.getMessage(), e);
-		} finally {
-			if (statement != null) {
-				statement.close();
-			}
-		}
-	}
+      sql = SqlFactory.getNative(connection).drop().table(tableName).build();
+      executeUpdate(connection, sql);
+    }
+  }
 
+  private void executeUpdate(Connection connection, String sql) throws SQLException {
+    PreparedStatement statement = null;
+    try {
+      statement = connection.prepareStatement(sql);
+      logger.info(sql);
+      statement.executeUpdate();
+    } catch (SQLException e) {
+      logger.error(sql);
+      logger.error(e.getMessage(), e);
+    } finally {
+      if (statement != null) {
+        statement.close();
+      }
+    }
+  }
 }

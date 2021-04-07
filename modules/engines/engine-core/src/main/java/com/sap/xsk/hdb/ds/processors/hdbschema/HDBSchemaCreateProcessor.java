@@ -20,12 +20,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class HDBSchemaCreateProcessor extends AbstractXSKProcessor<XSKDataStructureHDBSchemaModel> {
-    public HDBSchemaCreateProcessor() {}
+  public HDBSchemaCreateProcessor() {}
 
-    private static final Logger logger = LoggerFactory.getLogger(HDBSchemaCreateProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(HDBSchemaCreateProcessor.class);
 
-    public void execute(Connection connection, XSKDataStructureHDBSchemaModel hdbSchema) throws SQLException {
-        String sql = "CREATE SCHEMA " + hdbSchema.getName();
-        executeSql(sql, connection);
-    }
+  public void execute(Connection connection, XSKDataStructureHDBSchemaModel hdbSchema)
+      throws SQLException {
+    String sql = "CREATE SCHEMA " + hdbSchema.getName();
+    executeSql(sql, connection);
+  }
 }

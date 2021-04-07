@@ -41,80 +41,93 @@ import java.util.stream.Collectors;
 @Singleton
 public class XSKTableImportArtifactFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(XSKTableImportArtifactFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(XSKTableImportArtifactFactory.class);
 
-    private IRepository repository = StaticInjector.getInjector().getInstance(IRepository .class);
+  private IRepository repository = StaticInjector.getInjector().getInstance(IRepository.class);
 
-    private XSKCsvToHdbtiRelationDao xskCsvToHdbtiRelationDao = StaticInjector.getInjector().getInstance(XSKCsvToHdbtiRelationDao.class);
-    private XSKHDBTIParser xskhdbtiParser;
-    public XSKTableImportArtifactFactory() {
-        setupParser();
+  private XSKCsvToHdbtiRelationDao xskCsvToHdbtiRelationDao =
+      StaticInjector.getInjector().getInstance(XSKCsvToHdbtiRelationDao.class);
+  private XSKHDBTIParser xskhdbtiParser;
+
+  public XSKTableImportArtifactFactory() {
+    setupParser();
+  }
+
+  private void setupParser() {
+    xskhdbtiParser = new XSKHDBTIParser();
+  }
+
+  public XSKTableImportArtifact parseTableImport(String content, String location)
+      throws IOException, XSKHDBTISyntaxErrorException {
+    XSKTableImportArtifact tableImportArtifact = new XSKTableImportArtifact();
+    List<XSKTableImportConfigurationDefinition> importConfigurationDefinitions = new ArrayList<>();
+    List<XSKTableImportToCsvRelation> tableImportToCsvRelations = new ArrayList<>();
+
+    tableImportArtifact.setImportConfigurationDefinition(importConfigurationDefinitions);
+    tableImportArtifact.setTableImportToCsvRelations(tableImportToCsvRelations);
+
+    XSKHDBTIImportModel importObject = xskhdbtiParser.parse(content);
+
+    for (XSKHDBTIImportConfigModel configuration : importObject.getConfigModels()) {
+      addHdbtiToCsvRelation(tableImportArtifact, configuration, location);
+      addTableImportConfiguration(tableImportArtifact, configuration);
     }
 
-    private void setupParser() {
-        xskhdbtiParser = new XSKHDBTIParser();
+    return tableImportArtifact;
+  }
+
+  private void addTableImportConfiguration(
+      XSKTableImportArtifact tableImportArtifact, XSKHDBTIImportConfigModel configuration) {
+    XSKTableImportConfigurationDefinition tableImportConfigurationDefinition =
+        new XSKTableImportConfigurationDefinition();
+    tableImportConfigurationDefinition.setTable(configuration.getTableName());
+    tableImportConfigurationDefinition.setSchema(configuration.getSchemaName());
+    tableImportConfigurationDefinition.setFile(configuration.getFileName());
+    tableImportConfigurationDefinition.setHeader(configuration.getHeader());
+    tableImportConfigurationDefinition.setUseHeaderNames(configuration.getUseHeaderNames());
+    tableImportConfigurationDefinition.setDelimField(configuration.getDelimField());
+    tableImportConfigurationDefinition.setDelimEnclosing(configuration.getDelimEnclosing());
+    tableImportConfigurationDefinition.setDistinguishEmptyFromNull(
+        configuration.getDistinguishEmptyFromNull());
+    tableImportConfigurationDefinition.setKeysAsMap(handleKeyValuePairs(configuration.getKeys()));
+    tableImportArtifact.getImportConfigurationDefinition().add(tableImportConfigurationDefinition);
+  }
+
+  private void addHdbtiToCsvRelation(
+      XSKTableImportArtifact tableImportArtifact,
+      XSKHDBTIImportConfigModel configuration,
+      String hdbtiLocation) {
+    String csvParsedFilePath =
+        xskCsvToHdbtiRelationDao.convertToActualFileName(configuration.getFileName());
+    XSKTableImportToCsvRelation tableImportToCsvRelation = new XSKTableImportToCsvRelation();
+    IResource csvFile = repository.getResource(csvParsedFilePath);
+    tableImportToCsvRelation.setCsv(csvParsedFilePath);
+    tableImportToCsvRelation.setHdbti(hdbtiLocation);
+    tableImportToCsvRelation.setCsvHash(DigestUtils.md5Hex(getContentFromResource(csvFile)));
+    tableImportArtifact.getTableImportToCsvRelations().add(tableImportToCsvRelation);
+  }
+
+  private Map<String, String> handleKeyValuePairs(List<XSKHDBTIImportConfigModel.Pair> pairs) {
+    if (pairs == null) {
+      return new HashMap<>();
     }
 
-    public XSKTableImportArtifact parseTableImport(String content, String location) throws IOException, XSKHDBTISyntaxErrorException {
-        XSKTableImportArtifact tableImportArtifact = new XSKTableImportArtifact();
-        List<XSKTableImportConfigurationDefinition> importConfigurationDefinitions = new ArrayList<>();
-        List<XSKTableImportToCsvRelation> tableImportToCsvRelations = new ArrayList<>();
+    return pairs.stream()
+        .collect(
+            Collectors.toMap(
+                XSKHDBTIImportConfigModel.Pair::getKey, XSKHDBTIImportConfigModel.Pair::getValue));
+  }
 
-        tableImportArtifact.setImportConfigurationDefinition(importConfigurationDefinitions);
-        tableImportArtifact.setTableImportToCsvRelations(tableImportToCsvRelations);
-
-        XSKHDBTIImportModel importObject = xskhdbtiParser.parse(content);
-
-        for (XSKHDBTIImportConfigModel configuration : importObject.getConfigModels()) {
-            addHdbtiToCsvRelation(tableImportArtifact, configuration, location);
-            addTableImportConfiguration(tableImportArtifact, configuration);
-        }
-
-        return tableImportArtifact;
+  private String getContentFromResource(IResource resource) {
+    byte[] content = resource.getContent();
+    String contentAsString = null;
+    try {
+      contentAsString =
+          IOUtils.toString(
+              new InputStreamReader(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      logger.error("Error occured while reading the content from CSV File", e);
     }
-
-    private void addTableImportConfiguration(XSKTableImportArtifact tableImportArtifact, XSKHDBTIImportConfigModel configuration) {
-        XSKTableImportConfigurationDefinition tableImportConfigurationDefinition = new XSKTableImportConfigurationDefinition();
-        tableImportConfigurationDefinition.setTable(configuration.getTableName());
-        tableImportConfigurationDefinition.setSchema(configuration.getSchemaName());
-        tableImportConfigurationDefinition.setFile(configuration.getFileName());
-        tableImportConfigurationDefinition.setHeader(configuration.getHeader());
-        tableImportConfigurationDefinition.setUseHeaderNames(configuration.getUseHeaderNames());
-        tableImportConfigurationDefinition.setDelimField(configuration.getDelimField());
-        tableImportConfigurationDefinition.setDelimEnclosing(configuration.getDelimEnclosing());
-        tableImportConfigurationDefinition.setDistinguishEmptyFromNull(configuration.getDistinguishEmptyFromNull());
-        tableImportConfigurationDefinition.setKeysAsMap(handleKeyValuePairs(configuration.getKeys()));
-        tableImportArtifact.getImportConfigurationDefinition().add(tableImportConfigurationDefinition);
-    }
-
-    private void addHdbtiToCsvRelation(XSKTableImportArtifact tableImportArtifact, XSKHDBTIImportConfigModel configuration, String hdbtiLocation) {
-        String csvParsedFilePath = xskCsvToHdbtiRelationDao.convertToActualFileName(configuration.getFileName());
-        XSKTableImportToCsvRelation tableImportToCsvRelation = new XSKTableImportToCsvRelation();
-        IResource csvFile = repository.getResource(csvParsedFilePath);
-        tableImportToCsvRelation.setCsv(csvParsedFilePath);
-        tableImportToCsvRelation.setHdbti(hdbtiLocation);
-        tableImportToCsvRelation.setCsvHash(DigestUtils.md5Hex(getContentFromResource(csvFile)));
-        tableImportArtifact.getTableImportToCsvRelations().add(tableImportToCsvRelation);
-
-    }
-
-    private Map<String, String> handleKeyValuePairs(List<XSKHDBTIImportConfigModel.Pair> pairs) {
-        if (pairs == null) {
-            return new HashMap<>();
-        }
-
-        return pairs.stream().collect(Collectors.toMap(XSKHDBTIImportConfigModel.Pair::getKey, XSKHDBTIImportConfigModel.Pair::getValue));
-    }
-
-    private String getContentFromResource(IResource resource) {
-        byte[] content = resource.getContent();
-        String contentAsString = null;
-        try {
-            contentAsString = IOUtils
-                    .toString(new InputStreamReader(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            logger.error("Error occured while reading the content from CSV File" ,e);
-        }
-        return contentAsString;
-    }
+    return contentAsString;
+  }
 }

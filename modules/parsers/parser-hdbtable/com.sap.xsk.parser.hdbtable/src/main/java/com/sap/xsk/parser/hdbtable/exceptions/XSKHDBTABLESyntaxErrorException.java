@@ -11,8 +11,8 @@
  */
 package com.sap.xsk.parser.hdbtable.exceptions;
 
-public class XSKHDBTABLESyntaxErrorException extends  Exception{
-    public XSKHDBTABLESyntaxErrorException(String message) {
-        super(message);
-    }
+public class XSKHDBTABLESyntaxErrorException extends Exception {
+  public XSKHDBTABLESyntaxErrorException(String message) {
+    super(message);
+  }
 }

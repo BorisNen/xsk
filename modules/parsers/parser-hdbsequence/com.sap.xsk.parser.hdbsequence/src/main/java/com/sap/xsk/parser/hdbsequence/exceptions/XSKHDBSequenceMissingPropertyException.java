@@ -11,8 +11,8 @@
  */
 package com.sap.xsk.parser.hdbsequence.exceptions;
 
-public class XSKHDBSequenceMissingPropertyException extends RuntimeException{
-    public XSKHDBSequenceMissingPropertyException(String message) {
-        super(message);
-    }
+public class XSKHDBSequenceMissingPropertyException extends RuntimeException {
+  public XSKHDBSequenceMissingPropertyException(String message) {
+    super(message);
+  }
 }

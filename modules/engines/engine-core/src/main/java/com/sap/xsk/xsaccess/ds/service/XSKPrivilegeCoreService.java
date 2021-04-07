@@ -28,122 +28,125 @@ import com.sap.xsk.xsaccess.ds.model.privilege.XSKPrivilegeDefinition;
 
 public class XSKPrivilegeCoreService implements IXSKPrivilegeCoreService {
 
-    @Inject
-    private DataSource dataSource;
+  @Inject private DataSource dataSource;
 
-    @Inject
-    private PersistenceManager<XSKPrivilegeDefinition> xskPrivilegeDefinitionPersistenceManager;
+  @Inject
+  private PersistenceManager<XSKPrivilegeDefinition> xskPrivilegeDefinitionPersistenceManager;
 
-    @Override
-    public XSKPrivilegeDefinition createXSKPrivilege(String name, String description) throws XSKPrivilegeException {
-        try {
-            Connection connection = null;
-            try {
-                connection = dataSource.getConnection();
-                XSKPrivilegeDefinition xskPrivilegeDefinition = new XSKPrivilegeDefinition();
-                xskPrivilegeDefinition.setName(name);
-                xskPrivilegeDefinition.setDescription(description);
-                xskPrivilegeDefinition.setCreatedBy(UserFacade.getName());
-                xskPrivilegeDefinition.setCreatedAt(new Timestamp(new java.util.Date().getTime()));
+  @Override
+  public XSKPrivilegeDefinition createXSKPrivilege(String name, String description)
+      throws XSKPrivilegeException {
+    try {
+      Connection connection = null;
+      try {
+        connection = dataSource.getConnection();
+        XSKPrivilegeDefinition xskPrivilegeDefinition = new XSKPrivilegeDefinition();
+        xskPrivilegeDefinition.setName(name);
+        xskPrivilegeDefinition.setDescription(description);
+        xskPrivilegeDefinition.setCreatedBy(UserFacade.getName());
+        xskPrivilegeDefinition.setCreatedAt(new Timestamp(new java.util.Date().getTime()));
 
-                xskPrivilegeDefinitionPersistenceManager.insert(connection, xskPrivilegeDefinition);
+        xskPrivilegeDefinitionPersistenceManager.insert(connection, xskPrivilegeDefinition);
 
-                return xskPrivilegeDefinition;
-            } finally {
-                if (connection != null) {
-                    connection.close();
-                }
-            }
-        } catch (SQLException e) {
-            throw new XSKPrivilegeException(e);
+        return xskPrivilegeDefinition;
+      } finally {
+        if (connection != null) {
+          connection.close();
         }
+      }
+    } catch (SQLException e) {
+      throw new XSKPrivilegeException(e);
+    }
+  }
+
+  @Override
+  public XSKPrivilegeDefinition updateXSKPrivileges(String name, String description)
+      throws XSKPrivilegeException {
+    XSKPrivilegeDefinition foundXscPrivilegeDefinition = getXSKPrivilegeByName(name);
+    if (foundXscPrivilegeDefinition == null) {
+      throw new XSKPrivilegeException("XSK Privilege not found");
     }
 
-    @Override
-    public XSKPrivilegeDefinition updateXSKPrivileges(String name, String description) throws XSKPrivilegeException {
-        XSKPrivilegeDefinition foundXscPrivilegeDefinition = getXSKPrivilegeByName(name);
-        if (foundXscPrivilegeDefinition == null) {
-            throw new XSKPrivilegeException("XSK Privilege not found");
+    try {
+      Connection connection = null;
+      try {
+        connection = dataSource.getConnection();
+        foundXscPrivilegeDefinition.setName(name);
+        foundXscPrivilegeDefinition.setDescription(description);
+        xskPrivilegeDefinitionPersistenceManager.update(connection, foundXscPrivilegeDefinition);
+
+        return foundXscPrivilegeDefinition;
+      } finally {
+        if (connection != null) {
+          connection.close();
         }
+      }
+    } catch (SQLException e) {
+      throw new XSKPrivilegeException(e);
+    }
+  }
 
-        try {
-            Connection connection = null;
-            try {
-                connection = dataSource.getConnection();
-                foundXscPrivilegeDefinition.setName(name);
-                foundXscPrivilegeDefinition.setDescription(description);
-                xskPrivilegeDefinitionPersistenceManager.update(connection, foundXscPrivilegeDefinition);
-
-                return foundXscPrivilegeDefinition;
-            } finally {
-                if (connection != null) {
-                    connection.close();
-                }
-            }
-        } catch (SQLException e) {
-            throw new XSKPrivilegeException(e);
+  @Override
+  public List<XSKPrivilegeDefinition> getXSKPrivileges() throws XSKPrivilegeException {
+    try {
+      Connection connection = null;
+      try {
+        connection = dataSource.getConnection();
+        return xskPrivilegeDefinitionPersistenceManager.findAll(
+            connection, XSKPrivilegeDefinition.class);
+      } finally {
+        if (connection != null) {
+          connection.close();
         }
+      }
+    } catch (SQLException e) {
+      throw new XSKPrivilegeException(e);
     }
+  }
 
+  @Override
+  public void removeXSKPrivilegeByName(String name) throws XSKPrivilegeException {
+    try {
+      Connection connection = null;
+      try {
+        connection = dataSource.getConnection();
 
-
-    @Override
-    public List<XSKPrivilegeDefinition> getXSKPrivileges() throws XSKPrivilegeException {
-        try {
-            Connection connection = null;
-            try {
-                connection = dataSource.getConnection();
-                return xskPrivilegeDefinitionPersistenceManager.findAll(connection, XSKPrivilegeDefinition.class);
-            } finally {
-                if (connection != null) {
-                    connection.close();
-                }
-            }
-        } catch (SQLException e) {
-            throw new XSKPrivilegeException(e);
+        xskPrivilegeDefinitionPersistenceManager.delete(
+            connection, XSKPrivilegeDefinition.class, name);
+      } finally {
+        if (connection != null) {
+          connection.close();
         }
+      }
+    } catch (SQLException e) {
+      throw new XSKPrivilegeException(e);
     }
+  }
 
-    @Override
-    public void removeXSKPrivilegeByName(String name) throws XSKPrivilegeException {
-        try {
-            Connection connection = null;
-            try {
-                connection = dataSource.getConnection();
+  @Override
+  public XSKPrivilegeDefinition getXSKPrivilegeByName(String name) throws XSKPrivilegeException {
+    try {
+      Connection connection = null;
+      try {
+        connection = dataSource.getConnection();
 
-                xskPrivilegeDefinitionPersistenceManager.delete(connection, XSKPrivilegeDefinition.class, name);
-            } finally {
-                if (connection != null) {
-                    connection.close();
-                }
-            }
-        } catch (SQLException e) {
-            throw new XSKPrivilegeException(e);
+        XSKPrivilegeDefinition xskPrivilegeDefinition =
+            xskPrivilegeDefinitionPersistenceManager.find(
+                connection, XSKPrivilegeDefinition.class, name);
+
+        return xskPrivilegeDefinition;
+      } finally {
+        if (connection != null) {
+          connection.close();
         }
+      }
+    } catch (SQLException e) {
+      throw new XSKPrivilegeException(e);
     }
+  }
 
-    @Override
-    public XSKPrivilegeDefinition getXSKPrivilegeByName(String name) throws XSKPrivilegeException {
-        try {
-            Connection connection = null;
-            try {
-                connection = dataSource.getConnection();
-
-                XSKPrivilegeDefinition xskPrivilegeDefinition = xskPrivilegeDefinitionPersistenceManager.find(connection, XSKPrivilegeDefinition.class, name);
-
-                return xskPrivilegeDefinition;
-            } finally {
-                if (connection != null) {
-                    connection.close();
-                }
-            }
-        } catch (SQLException e) {
-            throw new XSKPrivilegeException(e);
-        }
-    }
-
-    @Override
-    public boolean xskPrivilegeExists(String name) throws XSKPrivilegeException {
-        return getXSKPrivilegeByName(name) != null;
-    }
+  @Override
+  public boolean xskPrivilegeExists(String name) throws XSKPrivilegeException {
+    return getXSKPrivilegeByName(name) != null;
+  }
 }

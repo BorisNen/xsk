@@ -22,40 +22,42 @@ import com.sap.xsk.xsaccess.ds.api.IXSKAccessCoreService;
 import com.sap.xsk.xsaccess.ds.api.IXSKPrivilegeCoreService;
 
 public class XSKSecurityClasspathContentHandler extends AbstractClasspathContentHandler {
-    private static final Logger logger = LoggerFactory.getLogger(XSKSecurityClasspathContentHandler.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(XSKSecurityClasspathContentHandler.class);
 
-    private XSKSecuritySynchronizer extensionsSynchronizer = StaticInjector.getInjector().getInstance(XSKSecuritySynchronizer.class);
+  private XSKSecuritySynchronizer extensionsSynchronizer =
+      StaticInjector.getInjector().getInstance(XSKSecuritySynchronizer.class);
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.commons.api.content.AbstractClasspathContentHandler#isValid(java.lang.String)
-     */
-    @Override
-    protected boolean isValid(String path) {
-        boolean isValid = false;
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.commons.api.content.AbstractClasspathContentHandler#isValid(java.lang.String)
+   */
+  @Override
+  protected boolean isValid(String path) {
+    boolean isValid = false;
 
-        try {
-            if (path.endsWith(IXSKAccessCoreService.XSK_FILE_EXTENSION_ACCESS)) {
-                isValid = true;
-                extensionsSynchronizer.registerPredeliveredAccess(path);
-            }
-            if (path.endsWith(IXSKPrivilegeCoreService.XSK_FILE_EXTENSION_PRIVILEGE)) {
-                isValid = true;
-                extensionsSynchronizer.registerPredeliveredPrivileges(path);
-            }
-        } catch (IOException e) {
-            logger.error("Predelivered Security Access or Roles artifact is not valid", e);
-        }
-
-        return isValid;
+    try {
+      if (path.endsWith(IXSKAccessCoreService.XSK_FILE_EXTENSION_ACCESS)) {
+        isValid = true;
+        extensionsSynchronizer.registerPredeliveredAccess(path);
+      }
+      if (path.endsWith(IXSKPrivilegeCoreService.XSK_FILE_EXTENSION_PRIVILEGE)) {
+        isValid = true;
+        extensionsSynchronizer.registerPredeliveredPrivileges(path);
+      }
+    } catch (IOException e) {
+      logger.error("Predelivered Security Access or Roles artifact is not valid", e);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.commons.api.content.AbstractClasspathContentHandler#getLogger()
-     */
-    @Override
-    protected Logger getLogger() {
-        return logger;
-    }
+    return isValid;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.commons.api.content.AbstractClasspathContentHandler#getLogger()
+   */
+  @Override
+  protected Logger getLogger() {
+    return logger;
+  }
 }

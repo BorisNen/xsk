@@ -5,10 +5,6 @@ package com.sap.xsk.models.hdbdd.web;
 
 import org.eclipse.xtext.web.server.DefaultWebModule;
 
-/**
- * Manual modifications go to {@link HdbDDWebModule}.
- */
+/** Manual modifications go to {@link HdbDDWebModule}. */
 @SuppressWarnings("all")
-public abstract class AbstractHdbDDWebModule extends DefaultWebModule {
-
-}
+public abstract class AbstractHdbDDWebModule extends DefaultWebModule {}

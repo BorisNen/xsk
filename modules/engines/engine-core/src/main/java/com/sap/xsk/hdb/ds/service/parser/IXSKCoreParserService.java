@@ -17,7 +17,8 @@ import com.sap.xsk.hdb.ds.model.XSKDataStructureModel;
 import java.io.IOException;
 
 public interface IXSKCoreParserService {
-    XSKDataStructureModel parseDataStructure(String type, String location, String content) throws XSKDataStructuresException, IOException;
+  XSKDataStructureModel parseDataStructure(String type, String location, String content)
+      throws XSKDataStructuresException, IOException;
 
-    Class<XSKDataStructureModel> getDataStructureClass(String type);
+  Class<XSKDataStructureModel> getDataStructureClass(String type);
 }

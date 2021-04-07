@@ -32,125 +32,150 @@ import java.util.List;
 import static java.text.MessageFormat.format;
 
 public class XSKDataStructuresCoreService implements IXSKDataStructuresCoreService {
-    @Inject
-    private DataSource dataSource;
+  @Inject private DataSource dataSource;
 
-    @Inject
-    private PersistenceManager<XSKDataStructureModel> persistenceManager;
+  @Inject private PersistenceManager<XSKDataStructureModel> persistenceManager;
 
-    @com.google.inject.Inject @Named("xskCoreParserService")
-    private IXSKCoreParserService xskCoreParserService;
+  @com.google.inject.Inject
+  @Named("xskCoreParserService")
+  private IXSKCoreParserService xskCoreParserService;
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#createDataStructure(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-     */
-    @Override
-    public XSKDataStructureModel createDataStructure(String location, String name, String hash, String type) throws XSKDataStructuresException {
-        XSKDataStructureModel dataStructure = new XSKDataStructureModel();
-        dataStructure.setLocation(location);
-        dataStructure.setName(name);
-        dataStructure.setType(type);
-        dataStructure.setHash(hash);
-        dataStructure.setCreatedBy(UserFacade.getName());
-        dataStructure.setCreatedAt(new Timestamp(new java.util.Date().getTime()));
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#createDataStructure(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+   */
+  @Override
+  public XSKDataStructureModel createDataStructure(
+      String location, String name, String hash, String type) throws XSKDataStructuresException {
+    XSKDataStructureModel dataStructure = new XSKDataStructureModel();
+    dataStructure.setLocation(location);
+    dataStructure.setName(name);
+    dataStructure.setType(type);
+    dataStructure.setHash(hash);
+    dataStructure.setCreatedBy(UserFacade.getName());
+    dataStructure.setCreatedAt(new Timestamp(new java.util.Date().getTime()));
 
-        try (Connection connection = dataSource.getConnection()) {
-            persistenceManager.insert(connection, dataStructure);
-            return dataStructure;
-        } catch (SQLException e) {
-            throw new XSKDataStructuresException(e);
-        }
+    try (Connection connection = dataSource.getConnection()) {
+      persistenceManager.insert(connection, dataStructure);
+      return dataStructure;
+    } catch (SQLException e) {
+      throw new XSKDataStructuresException(e);
     }
+  }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#getDataStructure(java.lang.String, java.lang.String)
-     */
-    @Override
-    public <T extends XSKDataStructureModel> T getDataStructure(String location, String type) throws XSKDataStructuresException {
-        try (Connection connection = dataSource.getConnection()) {
-            return (T) persistenceManager.find(connection, xskCoreParserService.getDataStructureClass(type), location);
-        } catch (SQLException e) {
-            throw new XSKDataStructuresException(e);
-        }
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#getDataStructure(java.lang.String, java.lang.String)
+   */
+  @Override
+  public <T extends XSKDataStructureModel> T getDataStructure(String location, String type)
+      throws XSKDataStructuresException {
+    try (Connection connection = dataSource.getConnection()) {
+      return (T)
+          persistenceManager.find(
+              connection, xskCoreParserService.getDataStructureClass(type), location);
+    } catch (SQLException e) {
+      throw new XSKDataStructuresException(e);
     }
+  }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#getDataStructureByName(java.lang.String, java.lang.String)
-     */
-    @Override
-    public <T extends XSKDataStructureModel> T getDataStructureByName(String name, String type) throws XSKDataStructuresException {
-        try (Connection connection = dataSource.getConnection()) {
-            String sql = SqlFactory.getNative(connection).select().column("*").from("XSK_DATA_STRUCTURES")
-                    .where("DS_NAME = ? AND DS_TYPE = ?").toString();
-            List<XSKDataStructureModel> dataStructures = persistenceManager.query(connection, XSKDataStructureModel.class, sql,
-                    Arrays.asList(name, type));
-            if (dataStructures.isEmpty()) {
-                return null;
-            }
-            if (dataStructures.size() > 1) {
-                throw new XSKDataStructuresException(format("There are more that one Table with the same name [{0}] at locations: [{1}] and [{2}].",
-                        name, dataStructures.get(0).getLocation(), dataStructures.get(1).getLocation()));
-            }
-            return (T) dataStructures.get(0);
-        } catch (SQLException e) {
-            throw new XSKDataStructuresException(e);
-        }
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#getDataStructureByName(java.lang.String, java.lang.String)
+   */
+  @Override
+  public <T extends XSKDataStructureModel> T getDataStructureByName(String name, String type)
+      throws XSKDataStructuresException {
+    try (Connection connection = dataSource.getConnection()) {
+      String sql =
+          SqlFactory.getNative(connection)
+              .select()
+              .column("*")
+              .from("XSK_DATA_STRUCTURES")
+              .where("DS_NAME = ? AND DS_TYPE = ?")
+              .toString();
+      List<XSKDataStructureModel> dataStructures =
+          persistenceManager.query(
+              connection, XSKDataStructureModel.class, sql, Arrays.asList(name, type));
+      if (dataStructures.isEmpty()) {
+        return null;
+      }
+      if (dataStructures.size() > 1) {
+        throw new XSKDataStructuresException(
+            format(
+                "There are more that one Table with the same name [{0}] at locations: [{1}] and [{2}].",
+                name, dataStructures.get(0).getLocation(), dataStructures.get(1).getLocation()));
+      }
+      return (T) dataStructures.get(0);
+    } catch (SQLException e) {
+      throw new XSKDataStructuresException(e);
     }
+  }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#removeDataStructure(java.lang.String)
-     */
-    @Override
-    public void removeDataStructure(String location) throws XSKDataStructuresException {
-        try (Connection connection = dataSource.getConnection()) {
-            persistenceManager.delete(connection, XSKDataStructureModel.class, location);
-        } catch (SQLException e) {
-            throw new XSKDataStructuresException(e);
-        }
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#removeDataStructure(java.lang.String)
+   */
+  @Override
+  public void removeDataStructure(String location) throws XSKDataStructuresException {
+    try (Connection connection = dataSource.getConnection()) {
+      persistenceManager.delete(connection, XSKDataStructureModel.class, location);
+    } catch (SQLException e) {
+      throw new XSKDataStructuresException(e);
     }
+  }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#updateDataStructure(java.lang.String,
-     * java.lang.String, java.lang.String, java.lang.String)
-     */
-    @Override
-    public void updateDataStructure(String location, String name, String hash, String type) throws XSKDataStructuresException {
-        try (Connection connection = dataSource.getConnection()) {
-            XSKDataStructureModel dataStructure = getDataStructure(location, type);
-            dataStructure.setName(name);
-            dataStructure.setHash(hash);
-            persistenceManager.update(connection, dataStructure);
-        } catch (SQLException e) {
-            throw new XSKDataStructuresException(e);
-        }
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#updateDataStructure(java.lang.String,
+   * java.lang.String, java.lang.String, java.lang.String)
+   */
+  @Override
+  public void updateDataStructure(String location, String name, String hash, String type)
+      throws XSKDataStructuresException {
+    try (Connection connection = dataSource.getConnection()) {
+      XSKDataStructureModel dataStructure = getDataStructure(location, type);
+      dataStructure.setName(name);
+      dataStructure.setHash(hash);
+      persistenceManager.update(connection, dataStructure);
+    } catch (SQLException e) {
+      throw new XSKDataStructuresException(e);
     }
+  }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#getDataStructures(java.lang.String)
-     */
-    @Override
-    public <T extends XSKDataStructureModel> List<T> getDataStructuresByType(String type) throws XSKDataStructuresException {
-        try (Connection connection = dataSource.getConnection()) {
-            String sql = SqlFactory.getNative(connection).select().column("*").from("XSK_DATA_STRUCTURES").where("DS_TYPE = ?").toString();
-            return (List<T>) persistenceManager.query(connection, xskCoreParserService.getDataStructureClass(type), sql,
-                    Arrays.asList(type));
-        } catch (SQLException e) {
-            throw new XSKDataStructuresException(e);
-        }
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#getDataStructures(java.lang.String)
+   */
+  @Override
+  public <T extends XSKDataStructureModel> List<T> getDataStructuresByType(String type)
+      throws XSKDataStructuresException {
+    try (Connection connection = dataSource.getConnection()) {
+      String sql =
+          SqlFactory.getNative(connection)
+              .select()
+              .column("*")
+              .from("XSK_DATA_STRUCTURES")
+              .where("DS_TYPE = ?")
+              .toString();
+      return (List<T>)
+          persistenceManager.query(
+              connection,
+              xskCoreParserService.getDataStructureClass(type),
+              sql,
+              Arrays.asList(type));
+    } catch (SQLException e) {
+      throw new XSKDataStructuresException(e);
     }
+  }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#existsDataStructure(java.lang.String, java.lang.String)
-     */
-    @Override
-    public boolean existsDataStructure(String location, String type) throws XSKDataStructuresException {
-        return getDataStructure(location, type) != null;
-    }
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.database.ds.api.IDataStructuresCoreService#existsDataStructure(java.lang.String, java.lang.String)
+   */
+  @Override
+  public boolean existsDataStructure(String location, String type)
+      throws XSKDataStructuresException {
+    return getDataStructure(location, type) != null;
+  }
 }

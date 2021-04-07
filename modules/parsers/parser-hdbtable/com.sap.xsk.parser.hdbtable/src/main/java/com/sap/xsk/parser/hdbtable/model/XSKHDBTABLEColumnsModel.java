@@ -12,88 +12,87 @@
 package com.sap.xsk.parser.hdbtable.model;
 
 public class XSKHDBTABLEColumnsModel {
-    private String name;
-    private String sqlType;
-    private boolean nullable;
-    private boolean unique;
-    private String length;
-    private String comment;
-    private String defaultValue;
-    private String precision;
-    private String scale;
+  private String name;
+  private String sqlType;
+  private boolean nullable;
+  private boolean unique;
+  private String length;
+  private String comment;
+  private String defaultValue;
+  private String precision;
+  private String scale;
 
-    public XSKHDBTABLEColumnsModel() {
-    }
+  public XSKHDBTABLEColumnsModel() {}
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getSqlType() {
-        return sqlType;
-    }
+  public String getSqlType() {
+    return sqlType;
+  }
 
-    public void setSqlType(String sqlType) {
-        this.sqlType = sqlType;
-    }
+  public void setSqlType(String sqlType) {
+    this.sqlType = sqlType;
+  }
 
-    public boolean isNullable() {
-        return nullable;
-    }
+  public boolean isNullable() {
+    return nullable;
+  }
 
-    public void setNullable(boolean nullable) {
-        this.nullable = nullable;
-    }
+  public void setNullable(boolean nullable) {
+    this.nullable = nullable;
+  }
 
-    public String getLength() {
-        return length;
-    }
+  public String getLength() {
+    return length;
+  }
 
-    public void setLength(String length) {
-        this.length = length;
-    }
+  public void setLength(String length) {
+    this.length = length;
+  }
 
-    public String getComment() {
-        return comment;
-    }
+  public String getComment() {
+    return comment;
+  }
 
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
+  public void setComment(String comment) {
+    this.comment = comment;
+  }
 
-    public String getDefaultValue() {
-        return defaultValue;
-    }
+  public String getDefaultValue() {
+    return defaultValue;
+  }
 
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
+  public void setDefaultValue(String defaultValue) {
+    this.defaultValue = defaultValue;
+  }
 
-    public String getPrecision() {
-        return precision;
-    }
+  public String getPrecision() {
+    return precision;
+  }
 
-    public void setPrecision(String precision) {
-        this.precision = precision;
-    }
+  public void setPrecision(String precision) {
+    this.precision = precision;
+  }
 
-    public String getScale() {
-        return scale;
-    }
+  public String getScale() {
+    return scale;
+  }
 
-    public void setScale(String scale) {
-        this.scale = scale;
-    }
+  public void setScale(String scale) {
+    this.scale = scale;
+  }
 
-    public boolean isUnique() {
-        return unique;
-    }
+  public boolean isUnique() {
+    return unique;
+  }
 
-    public void setUnique(boolean unique) {
-        this.unique = unique;
-    }
+  public void setUnique(boolean unique) {
+    this.unique = unique;
+  }
 }

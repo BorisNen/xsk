@@ -15,29 +15,28 @@ import org.eclipse.dirigible.commons.api.module.StaticInjector;
 import org.eclipse.dirigible.core.scheduler.api.AbstractSynchronizerJob;
 import org.eclipse.dirigible.core.scheduler.api.ISynchronizer;
 
-/**
- * The XSK Data Structures HDI Synchronizer Job.
- */
+/** The XSK Data Structures HDI Synchronizer Job. */
 public class XSKDataStructuresHDISynchronizerJob extends AbstractSynchronizerJob {
 
-	private XSKDataStructuresHDISynchronizer dataStructureHDISynchronizer = StaticInjector.getInjector().getInstance(XSKDataStructuresHDISynchronizer.class);
+  private XSKDataStructuresHDISynchronizer dataStructureHDISynchronizer =
+      StaticInjector.getInjector().getInstance(XSKDataStructuresHDISynchronizer.class);
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.dirigible.core.scheduler.api.AbstractSynchronizerJob#getSynchronizer()
-	 */
-	@Override
-	public ISynchronizer getSynchronizer() {
-		return dataStructureHDISynchronizer;
-	}
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.core.scheduler.api.AbstractSynchronizerJob#getSynchronizer()
+   */
+  @Override
+  public ISynchronizer getSynchronizer() {
+    return dataStructureHDISynchronizer;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.dirigible.core.scheduler.api.AbstractSynchronizerJob#getName()
-	 */
-	@Override
-	public String getName() {
-		return XSKDataStructuresHDISynchronizerJobDefinitionProvider.XSK_DATA_STRUCTURES_HDI_SYNCHRONIZER_JOB;
-	}
-
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.dirigible.core.scheduler.api.AbstractSynchronizerJob#getName()
+   */
+  @Override
+  public String getName() {
+    return XSKDataStructuresHDISynchronizerJobDefinitionProvider
+        .XSK_DATA_STRUCTURES_HDI_SYNCHRONIZER_JOB;
+  }
 }

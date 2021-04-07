@@ -40,50 +40,52 @@ import static org.mockito.Mockito.*;
 @PrepareForTest({SqlFactory.class, Configuration.class})
 public class HDBSequenceProcessorsTest extends AbstractGuiceTest {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private Connection mockConnection;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private Connection mockConnection;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private SqlFactory mockSqlFactory;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private SqlFactory mockSqlFactory;
 
-    @Before
-    public void openMocks() {
-        MockitoAnnotations.initMocks(this);
-    }
+  @Before
+  public void openMocks() {
+    MockitoAnnotations.initMocks(this);
+  }
 
-    @Test
-    public void executeCreate() throws Exception {
-        XSKHDBSequenceCreateProcessor spyProccessor = spy(XSKHDBSequenceCreateProcessor.class);
+  @Test
+  public void executeCreate() throws Exception {
+    XSKHDBSequenceCreateProcessor spyProccessor = spy(XSKHDBSequenceCreateProcessor.class);
 
-        XSKDataStructureHDBSequenceModel mockModel = mock(XSKDataStructureHDBSequenceModel.class);
-        spyProccessor.execute(mockConnection, mockModel);
+    XSKDataStructureHDBSequenceModel mockModel = mock(XSKDataStructureHDBSequenceModel.class);
+    spyProccessor.execute(mockConnection, mockModel);
 
-        verify(spyProccessor, times(1)).executeSql(anyString(), any());
-    }
+    verify(spyProccessor, times(1)).executeSql(anyString(), any());
+  }
 
-    @Test
-    public void executeUpdate() throws SQLException {
-        XSKHDBSequenceUpdateProcessor spyProccessor = spy(XSKHDBSequenceUpdateProcessor.class);
-        XSKDataStructureHDBSequenceModel mockModel = mock(XSKDataStructureHDBSequenceModel.class);
-        spyProccessor.execute(mockConnection, mockModel);
+  @Test
+  public void executeUpdate() throws SQLException {
+    XSKHDBSequenceUpdateProcessor spyProccessor = spy(XSKHDBSequenceUpdateProcessor.class);
+    XSKDataStructureHDBSequenceModel mockModel = mock(XSKDataStructureHDBSequenceModel.class);
+    spyProccessor.execute(mockConnection, mockModel);
 
-        verify(spyProccessor, times(1)).executeSql(anyString(), any());
-    }
+    verify(spyProccessor, times(1)).executeSql(anyString(), any());
+  }
 
-    @Test
-    public void executeDrop() throws SQLException {
-        XSKHDBSequenceDropProcessor spyProccessor = spy(XSKHDBSequenceDropProcessor.class);
-        PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
-        XSKDataStructureHDBSequenceModel mockModel = mock(XSKDataStructureHDBSequenceModel.class);
+  @Test
+  public void executeDrop() throws SQLException {
+    XSKHDBSequenceDropProcessor spyProccessor = spy(XSKHDBSequenceDropProcessor.class);
+    PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
+    XSKDataStructureHDBSequenceModel mockModel = mock(XSKDataStructureHDBSequenceModel.class);
 
-        when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false")).thenReturn("false");
-        when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlFactory);
+    when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"))
+        .thenReturn("false");
+    when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlFactory);
 
-        when(SqlFactory.getNative(mockConnection).exists(mockConnection, mockModel.getName(), DatabaseArtifactTypes.SEQUENCE)).thenReturn(true);
+    when(SqlFactory.getNative(mockConnection)
+            .exists(mockConnection, mockModel.getName(), DatabaseArtifactTypes.SEQUENCE))
+        .thenReturn(true);
 
-        spyProccessor.execute(mockConnection, mockModel);
+    spyProccessor.execute(mockConnection, mockModel);
 
-        verify(spyProccessor, times(1)).executeSql(anyString(), any());
-    }
-
+    verify(spyProccessor, times(1)).executeSql(anyString(), any());
+  }
 }

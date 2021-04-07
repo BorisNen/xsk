@@ -26,26 +26,30 @@ import static java.text.MessageFormat.format;
 
 public class HDBSynonymDropProcessor extends AbstractXSKProcessor<XSKDataStructureHDBSynonymModel> {
 
-    private static final Logger logger = LoggerFactory.getLogger(HDBSynonymDropProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(HDBSynonymDropProcessor.class);
 
-    /**
-     * Execute :
-     * DROP SYNONYM <synonym_name> [<drop_option>]
-     * If <drop_option> is not specified, then a non-cascaded drop is performed which only drops the specified synonym.
-     * Dependent objects of the synonym are invalidated but not dropped.
-     *
-     * @see <a href="https://help.sap.com/viewer/4fe29514fd584807ac9f2a04f6754767/1.0.12/en-US/20d7e172751910148bccb49de92d9859.html">DROP SYNONYM Statement (Data Definition)</a>
-     */
-    @Override
-    public void execute(Connection connection, XSKDataStructureHDBSynonymModel synonymModel) throws SQLException {
-        logger.info("Processing Drop Synonym: " + synonymModel.getName());
+  /**
+   * Execute : DROP SYNONYM <synonym_name> [<drop_option>] If <drop_option> is not specified, then a
+   * non-cascaded drop is performed which only drops the specified synonym. Dependent objects of the
+   * synonym are invalidated but not dropped.
+   *
+   * @see <a
+   *     href="https://help.sap.com/viewer/4fe29514fd584807ac9f2a04f6754767/1.0.12/en-US/20d7e172751910148bccb49de92d9859.html">DROP
+   *     SYNONYM Statement (Data Definition)</a>
+   */
+  @Override
+  public void execute(Connection connection, XSKDataStructureHDBSynonymModel synonymModel)
+      throws SQLException {
+    logger.info("Processing Drop Synonym: " + synonymModel.getName());
 
-        String synonymName = XSKUtils.escapeArtifactName(synonymModel.getName());
-        if (SqlFactory.getNative(connection).exists(connection, synonymName, DatabaseArtifactTypes.SYNONYM)) {
-            String sql = SqlFactory.getNative(connection).drop().synonym(synonymName).build();
-            executeSql(sql, connection);
-        } else {
-            logger.warn(format("Synonym [{0}] does not exists during the drop process", synonymModel.getName()));
-        }
+    String synonymName = XSKUtils.escapeArtifactName(synonymModel.getName());
+    if (SqlFactory.getNative(connection)
+        .exists(connection, synonymName, DatabaseArtifactTypes.SYNONYM)) {
+      String sql = SqlFactory.getNative(connection).drop().synonym(synonymName).build();
+      executeSql(sql, connection);
+    } else {
+      logger.warn(
+          format("Synonym [{0}] does not exists during the drop process", synonymModel.getName()));
     }
+  }
 }

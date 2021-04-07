@@ -31,49 +31,56 @@ import com.sap.ndb.bimodelcalculation.DataSource;
 import com.sap.ndb.bimodelcalculation.DataSources;
 
 public class HDBCalculationViewTest {
-	
-	@Test
-	public void serialize() throws JAXBException {
-		CalculationScenario calculationScenario = new CalculationScenario();
-		calculationScenario.setId("com.sap.xsk.samples::XSK_HDI_SIMPLE_CALC_VIEW");
-		calculationScenario.setOutputViewType(CalculationViewType.PROJECTION);
-		DataSource dataSource = new DataSource();
-		dataSource.setId("XSK_HDI_SIMPLE_TABLE");
-		dataSource.setResourceUri("XSK_HDI_SIMPLE_TABLE");
-		DataSources dataSources = new DataSources();
-		dataSources.getDataSource().add(dataSource);
-		calculationScenario.setDataSources(dataSources);
-		
-		StringWriter writer = new StringWriter();
-		JAXBContext context = JAXBContext.newInstance(CalculationScenario.class);
-		Marshaller m = context.createMarshaller();
-		m.marshal(calculationScenario, writer);
-		
-		System.out.println(writer.toString());
 
-	}
-	
-	@Test
-	public void deserialize() throws JAXBException {
-//		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:calculationScenario outputViewType=\"Projection\" id=\"com.sap.xsk.samples::XSK_HDI_SIMPLE_CALC_VIEW\" xmlns:ns2=\"http://www.sap.com/ndb/BiModelCalculation.ecore\"><dataSources><DataSource id=\"XSK_HDI_SIMPLE_TABLE\"><resourceUri>XSK_HDI_SIMPLE_TABLE</resourceUri></DataSource></dataSources></ns2:calculationScenario>";
-		
-		String xml = "";
-		try {
-			xml = org.apache.commons.io.IOUtils.toString(HDBCalculationViewTest.class.getResourceAsStream("/test.hdbcalculationview"));
-		} catch (IOException e) {
-			fail("Parsing of calculation view failed.");
-			e.printStackTrace();
-		}
-		
-		xml = xml.replace("<Calculation:scenario", "<Calculation:calculationScenario");
-		xml = xml.replace("</Calculation:scenario>", "</Calculation:calculationScenario>");
-		
-		JAXBContext context = JAXBContext.newInstance(CalculationScenario.class);
-		Unmarshaller um = context.createUnmarshaller();
-		CalculationScenario calculationScenario = (CalculationScenario) um.unmarshal(new StringReader(xml));
-		
-		assertEquals(calculationScenario.getId(), "com.sap.hana.example::projection");
-		assertEquals(calculationScenario.getDataSources().getDataSource().get(0).getResourceUri(), "com.sap.hana.example::TAB1");
-	}
+  @Test
+  public void serialize() throws JAXBException {
+    CalculationScenario calculationScenario = new CalculationScenario();
+    calculationScenario.setId("com.sap.xsk.samples::XSK_HDI_SIMPLE_CALC_VIEW");
+    calculationScenario.setOutputViewType(CalculationViewType.PROJECTION);
+    DataSource dataSource = new DataSource();
+    dataSource.setId("XSK_HDI_SIMPLE_TABLE");
+    dataSource.setResourceUri("XSK_HDI_SIMPLE_TABLE");
+    DataSources dataSources = new DataSources();
+    dataSources.getDataSource().add(dataSource);
+    calculationScenario.setDataSources(dataSources);
 
+    StringWriter writer = new StringWriter();
+    JAXBContext context = JAXBContext.newInstance(CalculationScenario.class);
+    Marshaller m = context.createMarshaller();
+    m.marshal(calculationScenario, writer);
+
+    System.out.println(writer.toString());
+  }
+
+  @Test
+  public void deserialize() throws JAXBException {
+    //		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"
+    // standalone=\"yes\"?><ns2:calculationScenario outputViewType=\"Projection\"
+    // id=\"com.sap.xsk.samples::XSK_HDI_SIMPLE_CALC_VIEW\"
+    // xmlns:ns2=\"http://www.sap.com/ndb/BiModelCalculation.ecore\"><dataSources><DataSource
+    // id=\"XSK_HDI_SIMPLE_TABLE\"><resourceUri>XSK_HDI_SIMPLE_TABLE</resourceUri></DataSource></dataSources></ns2:calculationScenario>";
+
+    String xml = "";
+    try {
+      xml =
+          org.apache.commons.io.IOUtils.toString(
+              HDBCalculationViewTest.class.getResourceAsStream("/test.hdbcalculationview"));
+    } catch (IOException e) {
+      fail("Parsing of calculation view failed.");
+      e.printStackTrace();
+    }
+
+    xml = xml.replace("<Calculation:scenario", "<Calculation:calculationScenario");
+    xml = xml.replace("</Calculation:scenario>", "</Calculation:calculationScenario>");
+
+    JAXBContext context = JAXBContext.newInstance(CalculationScenario.class);
+    Unmarshaller um = context.createUnmarshaller();
+    CalculationScenario calculationScenario =
+        (CalculationScenario) um.unmarshal(new StringReader(xml));
+
+    assertEquals(calculationScenario.getId(), "com.sap.hana.example::projection");
+    assertEquals(
+        calculationScenario.getDataSources().getDataSource().get(0).getResourceUri(),
+        "com.sap.hana.example::TAB1");
+  }
 }

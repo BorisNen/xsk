@@ -36,93 +36,93 @@ import com.sap.xsk.xssecurestore.ds.service.XSKSecureStoreCoreService;
 @Singleton
 public class XSKSecureStoreSynchronizer extends AbstractSynchronizer {
 
-    private static final Logger logger = LoggerFactory.getLogger(XSKSecureStoreSynchronizer.class);
+  private static final Logger logger = LoggerFactory.getLogger(XSKSecureStoreSynchronizer.class);
 
-    @Inject
-    private XSKSecureStoreCoreService xskSecureStoreCoreService;
-    
-    private final String SYNCHRONIZER_NAME = this.getClass().getCanonicalName();
-    
-    @Override
-    public void synchronize()  {
-        synchronized (XSKSecureStoreSynchronizer.class) {
-        	if (beforeSynchronizing()) {
-	            logger.trace("Synchronizing Secure Stores ...");
-	            try {
-	            	startSynchronization(SYNCHRONIZER_NAME);
-	                synchronizeRegistry();
-	                cleanup();
-	                successfulSynchronization(SYNCHRONIZER_NAME, format("Passed successfully."));
-	            } catch (Exception e) {
-	                logger.error("Synchronizing process for Secure Stores failed.", e);
-	                try {
-						failedSynchronization(SYNCHRONIZER_NAME, e.getMessage());
-					} catch (SchedulerException e1) {
-						logger.error("Synchronizing process for Secure Stores files failed in registering the state log.", e);
-					}
-	            }
-	            logger.trace("Done synchronizing Secure Stores.");
-	            afterSynchronizing();
-        	}
-        }
-    }
-    
-    /**
-     * Force synchronization.
-     */
-    public static final void forceSynchronization() {
-    	XSKSecureStoreSynchronizer synchronizer = StaticInjector.getInjector().getInstance(XSKSecureStoreSynchronizer.class);
-        synchronizer.setForcedSynchronization(true);
-		try {
-			synchronizer.synchronize();
-		} finally {
-			synchronizer.setForcedSynchronization(false);
-		}
-    }
+  @Inject private XSKSecureStoreCoreService xskSecureStoreCoreService;
 
-    @Override
-    protected void synchronizeResource(IResource resource) throws SynchronizationException {
-        String resourceName = resource.getName();
-        String location = resource.getPath();
-        String content = new String(resource.getContent());
+  private final String SYNCHRONIZER_NAME = this.getClass().getCanonicalName();
 
+  @Override
+  public void synchronize() {
+    synchronized (XSKSecureStoreSynchronizer.class) {
+      if (beforeSynchronizing()) {
+        logger.trace("Synchronizing Secure Stores ...");
         try {
-            if (resourceName.endsWith(IXSKSecureStoreModel.FILE_EXTENSION_XSSECURESTORE) &&
-                    !xskSecureStoreCoreService.existsSecureStore(location)) {
-                xskSecureStoreCoreService.createSecureStore(location, content);
-            }
-        } catch (XSKSecureStoreException e) {
-            throw  new SynchronizationException(e);
+          startSynchronization(SYNCHRONIZER_NAME);
+          synchronizeRegistry();
+          cleanup();
+          successfulSynchronization(SYNCHRONIZER_NAME, format("Passed successfully."));
+        } catch (Exception e) {
+          logger.error("Synchronizing process for Secure Stores failed.", e);
+          try {
+            failedSynchronization(SYNCHRONIZER_NAME, e.getMessage());
+          } catch (SchedulerException e1) {
+            logger.error(
+                "Synchronizing process for Secure Stores files failed in registering the state log.",
+                e);
+          }
         }
+        logger.trace("Done synchronizing Secure Stores.");
+        afterSynchronizing();
+      }
     }
+  }
 
-    @Override
-    protected void cleanup() throws SynchronizationException {
-        logger.trace("Cleaning up Secure Stores");
-        IRepository repository = getRepository();
+  /** Force synchronization. */
+  public static final void forceSynchronization() {
+    XSKSecureStoreSynchronizer synchronizer =
+        StaticInjector.getInjector().getInstance(XSKSecureStoreSynchronizer.class);
+    synchronizer.setForcedSynchronization(true);
+    try {
+      synchronizer.synchronize();
+    } finally {
+      synchronizer.setForcedSynchronization(false);
+    }
+  }
 
-        try {
-            List<XSKSecureStore> xskSecureStores = xskSecureStoreCoreService.getXSKSecureStores();
-            for (XSKSecureStore xskSecureStore: xskSecureStores) {
-                String xskSecureStoreLocation = xskSecureStore.getLocation();
-                if (!repository.hasResource(xskSecureStoreLocation)) {
-                    xskSecureStoreCoreService.removeXSKSecureStore(xskSecureStoreLocation);
-                    xskSecureStoreCoreService.deleteSecureStoreValuesByStoreId(xskSecureStoreLocation);
-                    logger.warn("Cleaned up Secure Stores from location: {}", xskSecureStoreLocation);
-                }
-            }
+  @Override
+  protected void synchronizeResource(IResource resource) throws SynchronizationException {
+    String resourceName = resource.getName();
+    String location = resource.getPath();
+    String content = new String(resource.getContent());
 
-        } catch (XSKSecureStoreException e) {
-            throw new SynchronizationException(e);
+    try {
+      if (resourceName.endsWith(IXSKSecureStoreModel.FILE_EXTENSION_XSSECURESTORE)
+          && !xskSecureStoreCoreService.existsSecureStore(location)) {
+        xskSecureStoreCoreService.createSecureStore(location, content);
+      }
+    } catch (XSKSecureStoreException e) {
+      throw new SynchronizationException(e);
+    }
+  }
+
+  @Override
+  protected void cleanup() throws SynchronizationException {
+    logger.trace("Cleaning up Secure Stores");
+    IRepository repository = getRepository();
+
+    try {
+      List<XSKSecureStore> xskSecureStores = xskSecureStoreCoreService.getXSKSecureStores();
+      for (XSKSecureStore xskSecureStore : xskSecureStores) {
+        String xskSecureStoreLocation = xskSecureStore.getLocation();
+        if (!repository.hasResource(xskSecureStoreLocation)) {
+          xskSecureStoreCoreService.removeXSKSecureStore(xskSecureStoreLocation);
+          xskSecureStoreCoreService.deleteSecureStoreValuesByStoreId(xskSecureStoreLocation);
+          logger.warn("Cleaned up Secure Stores from location: {}", xskSecureStoreLocation);
         }
+      }
+
+    } catch (XSKSecureStoreException e) {
+      throw new SynchronizationException(e);
     }
+  }
 
-    @Override
-    protected void synchronizeRegistry() throws SynchronizationException {
-        logger.trace("Synchronizing Secure Store from Registry...");
+  @Override
+  protected void synchronizeRegistry() throws SynchronizationException {
+    logger.trace("Synchronizing Secure Store from Registry...");
 
-        super.synchronizeRegistry();
+    super.synchronizeRegistry();
 
-        logger.trace("Done synchronizing Secure Store from Registry.");
-    }
+    logger.trace("Done synchronizing Secure Store from Registry.");
+  }
 }

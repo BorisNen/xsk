@@ -25,41 +25,53 @@ import javax.inject.Singleton;
 
 @Singleton
 public class XSKWriteContainerContentProcessor extends XSKHDIAbstractProcessor {
-	
-	public final void execute(Connection connection, String container, String[] files, String configuration) throws SQLException, IOException, ScriptingException {
-		
-		String[] folders = enumerateFolders(files);
-				
-		executeUpdate(connection, "CREATE LOCAL TEMPORARY COLUMN TABLE #PATHS LIKE _SYS_DI.TT_FILESFOLDERS_CONTENT;");
-		
-		String content = RegistryFacade.getText(configuration);
-		
-    	executeUpdate(connection, "INSERT INTO #PATHS (PATH, CONTENT) VALUES ('.hdiconfig', '" + content + "')");
-    	for (String folder : folders) {
-    		executeUpdate(connection, "INSERT INTO #PATHS (PATH, CONTENT) VALUES ('" + folder + "', NULL);");
-    	}
-    	for (String file : files) {
-    		content = RegistryFacade.getText(file);
-    		executeUpdate(connection, "INSERT INTO #PATHS (PATH, CONTENT) VALUES ('" + file.substring(1) + "', '" + content + "');");
-    	}
-    	executeQuery(connection, "CALL " + container + "#DI.WRITE(#PATHS, _SYS_DI.T_NO_PARAMETERS, ?, ?, ?);");
-    	executeUpdate(connection, "DROP TABLE #PATHS;");
-	}
-	
-	protected static String[] enumerateFolders(String[] files) {
-		Set<String> folders = new TreeSet<>();
-        for (String file : files) {
-        	RepositoryPath path = new RepositoryPath(file);
-        	String current = "";
-        	String[] segments = path.getSegments();
-			for (int i=0; i<segments.length-1; i++) {
-        		current += segments[i] + "/";
-        		if (!folders.contains(current)) {
-        			folders.add(current);
-        		}
-        	}
-        }
-		return folders.toArray(new String[] {});
-	}
 
+  public final void execute(
+      Connection connection, String container, String[] files, String configuration)
+      throws SQLException, IOException, ScriptingException {
+
+    String[] folders = enumerateFolders(files);
+
+    executeUpdate(
+        connection,
+        "CREATE LOCAL TEMPORARY COLUMN TABLE #PATHS LIKE _SYS_DI.TT_FILESFOLDERS_CONTENT;");
+
+    String content = RegistryFacade.getText(configuration);
+
+    executeUpdate(
+        connection, "INSERT INTO #PATHS (PATH, CONTENT) VALUES ('.hdiconfig', '" + content + "')");
+    for (String folder : folders) {
+      executeUpdate(
+          connection, "INSERT INTO #PATHS (PATH, CONTENT) VALUES ('" + folder + "', NULL);");
+    }
+    for (String file : files) {
+      content = RegistryFacade.getText(file);
+      executeUpdate(
+          connection,
+          "INSERT INTO #PATHS (PATH, CONTENT) VALUES ('"
+              + file.substring(1)
+              + "', '"
+              + content
+              + "');");
+    }
+    executeQuery(
+        connection, "CALL " + container + "#DI.WRITE(#PATHS, _SYS_DI.T_NO_PARAMETERS, ?, ?, ?);");
+    executeUpdate(connection, "DROP TABLE #PATHS;");
+  }
+
+  protected static String[] enumerateFolders(String[] files) {
+    Set<String> folders = new TreeSet<>();
+    for (String file : files) {
+      RepositoryPath path = new RepositoryPath(file);
+      String current = "";
+      String[] segments = path.getSegments();
+      for (int i = 0; i < segments.length - 1; i++) {
+        current += segments[i] + "/";
+        if (!folders.contains(current)) {
+          folders.add(current);
+        }
+      }
+    }
+    return folders.toArray(new String[] {});
+  }
 }

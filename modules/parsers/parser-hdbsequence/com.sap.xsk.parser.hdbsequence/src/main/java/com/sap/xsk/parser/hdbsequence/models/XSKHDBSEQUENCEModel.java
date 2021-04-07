@@ -20,164 +20,181 @@ import java.util.Objects;
 
 public class XSKHDBSEQUENCEModel {
 
-    String schema;
-    Integer increment_by;
-    Integer start_with;
-    Integer maxvalue;
-    Boolean nomaxvalue;
-    Integer minvalue;
-    Boolean nominvalue;
-    Boolean cycles;
-    String reset_by;
+  String schema;
+  Integer increment_by;
+  Integer start_with;
+  Integer maxvalue;
+  Boolean nomaxvalue;
+  Integer minvalue;
+  Boolean nominvalue;
+  Boolean cycles;
+  String reset_by;
 
-    @SerializedName(value = HDBSequenceConstants.PUBLIC_PROPERTY)
-    Boolean publicc;
+  @SerializedName(value = HDBSequenceConstants.PUBLIC_PROPERTY)
+  Boolean publicc;
 
-    String depends_on_table;
-    String depends_on_view;
-    List<String> depends_on;
+  String depends_on_table;
+  String depends_on_view;
+  List<String> depends_on;
 
-    private void checkMandatoryFieldsPresence(String schema, Integer increment_by, Integer start_with,
-                                              Boolean nomaxvalue, Boolean nominvalue, Boolean publicc) throws XSKHDBSequenceMissingPropertyException {
-        checkPresence( schema , HDBSequenceConstants.SCHEMA_PROPERTY);
-        checkPresence( increment_by ,  HDBSequenceConstants.INCREMENT_BY_PROPERTY);
-        checkPresence( start_with ,  HDBSequenceConstants.START_WITH_PROPERTY);
-        checkPresence( nomaxvalue , HDBSequenceConstants.NOMAXVALUE_PROPERTY);
-        checkPresence( nominvalue ,  HDBSequenceConstants.NOMINVALUE_PROPERTY);
-        checkPresence(  publicc, HDBSequenceConstants.PUBLIC_PROPERTY );
+  private void checkMandatoryFieldsPresence(
+      String schema,
+      Integer increment_by,
+      Integer start_with,
+      Boolean nomaxvalue,
+      Boolean nominvalue,
+      Boolean publicc)
+      throws XSKHDBSequenceMissingPropertyException {
+    checkPresence(schema, HDBSequenceConstants.SCHEMA_PROPERTY);
+    checkPresence(increment_by, HDBSequenceConstants.INCREMENT_BY_PROPERTY);
+    checkPresence(start_with, HDBSequenceConstants.START_WITH_PROPERTY);
+    checkPresence(nomaxvalue, HDBSequenceConstants.NOMAXVALUE_PROPERTY);
+    checkPresence(nominvalue, HDBSequenceConstants.NOMINVALUE_PROPERTY);
+    checkPresence(publicc, HDBSequenceConstants.PUBLIC_PROPERTY);
+  }
 
+  private <T> void checkPresence(T field, String fieldName)
+      throws XSKHDBSequenceMissingPropertyException {
+    if (Objects.isNull(field)) {
+      throw new XSKHDBSequenceMissingPropertyException(
+          String.format("Missing mandatory field %s!", fieldName));
     }
+  }
 
-    private <T> void checkPresence(T field, String fieldName) throws XSKHDBSequenceMissingPropertyException {
-        if(Objects.isNull(field)){
-            throw new XSKHDBSequenceMissingPropertyException(String.format("Missing mandatory field %s!", fieldName));
+  public XSKHDBSEQUENCEModel() {}
 
-        }
-    }
+  public XSKHDBSEQUENCEModel(
+      String schema,
+      Integer increment_by,
+      Integer start_with,
+      Integer maxvalue,
+      Boolean nomaxvalue,
+      Integer minvalue,
+      Boolean nominvalue,
+      Boolean cycles,
+      String reset_by,
+      Boolean publicc,
+      String depends_on_table,
+      String depends_on_view,
+      List<String> depends_on)
+      throws XSKHDBSequenceMissingPropertyException {
+    checkMandatoryFieldsPresence(schema, increment_by, start_with, nomaxvalue, nominvalue, publicc);
+    this.schema = schema;
+    this.increment_by = increment_by;
+    this.start_with = start_with;
+    this.maxvalue = maxvalue;
+    this.nomaxvalue = nomaxvalue;
+    this.minvalue = minvalue;
+    this.nominvalue = nominvalue;
+    this.cycles = cycles;
+    this.reset_by = reset_by;
+    this.publicc = publicc;
+    this.depends_on_table = depends_on_table;
+    this.depends_on_view = depends_on_view;
+    this.depends_on = depends_on;
+  }
 
-    public XSKHDBSEQUENCEModel() {
-    }
+  public String getSchema() {
+    return schema;
+  }
 
-    public XSKHDBSEQUENCEModel(String schema, Integer increment_by, Integer start_with, Integer maxvalue,
-                               Boolean nomaxvalue, Integer minvalue, Boolean nominvalue, Boolean cycles, String reset_by,
-                               Boolean publicc, String depends_on_table, String depends_on_view, List<String> depends_on) throws XSKHDBSequenceMissingPropertyException {
-        checkMandatoryFieldsPresence(schema, increment_by, start_with, nomaxvalue, nominvalue, publicc);
-        this.schema = schema;
-        this.increment_by = increment_by;
-        this.start_with = start_with;
-        this.maxvalue = maxvalue;
-        this.nomaxvalue = nomaxvalue;
-        this.minvalue = minvalue;
-        this.nominvalue = nominvalue;
-        this.cycles = cycles;
-        this.reset_by = reset_by;
-        this.publicc = publicc;
-        this.depends_on_table = depends_on_table;
-        this.depends_on_view = depends_on_view;
-        this.depends_on = depends_on;
-    }
+  public void setSchema(String schema) {
+    this.schema = schema;
+  }
 
-    public String getSchema() {
-        return schema;
-    }
+  public Integer getIncrement_by() {
+    return increment_by;
+  }
 
-    public void setSchema(String schema) {
-        this.schema = schema;
-    }
+  public void setIncrement_by(Integer increment_by) {
+    this.increment_by = increment_by;
+  }
 
-    public Integer getIncrement_by() {
-        return increment_by;
-    }
+  public Integer getStart_with() {
+    return start_with;
+  }
 
-    public void setIncrement_by(Integer increment_by) {
-        this.increment_by = increment_by;
-    }
+  public void setStart_with(Integer start_with) {
+    this.start_with = start_with;
+  }
 
-    public Integer getStart_with() {
-        return start_with;
-    }
+  public Integer getMaxvalue() {
+    return maxvalue;
+  }
 
-    public void setStart_with(Integer start_with) {
-        this.start_with = start_with;
-    }
+  public void setMaxvalue(Integer maxvalue) {
+    this.maxvalue = maxvalue;
+  }
 
-    public Integer getMaxvalue() {
-        return maxvalue;
-    }
+  public Boolean getNomaxvalue() {
+    return nomaxvalue;
+  }
 
-    public void setMaxvalue(Integer maxvalue) {
-        this.maxvalue = maxvalue;
-    }
+  public void setNomaxvalue(Boolean nomaxvalue) {
+    this.nomaxvalue = nomaxvalue;
+  }
 
-    public Boolean getNomaxvalue() {
-        return nomaxvalue;
-    }
+  public Integer getMinvalue() {
+    return minvalue;
+  }
 
-    public void setNomaxvalue(Boolean nomaxvalue) {
-        this.nomaxvalue = nomaxvalue;
-    }
+  public void setMinvalue(Integer minvalue) {
+    this.minvalue = minvalue;
+  }
 
-    public Integer getMinvalue() {
-        return minvalue;
-    }
+  public Boolean getNominvalue() {
+    return nominvalue;
+  }
 
-    public void setMinvalue(Integer minvalue) {
-        this.minvalue = minvalue;
-    }
+  public void setNominvalue(Boolean nominvalue) {
+    this.nominvalue = nominvalue;
+  }
 
-    public Boolean getNominvalue() {
-        return nominvalue;
-    }
+  public Boolean getCycles() {
+    return cycles;
+  }
 
-    public void setNominvalue(Boolean nominvalue) {
-        this.nominvalue = nominvalue;
-    }
+  public void setCycles(Boolean cycles) {
+    this.cycles = cycles;
+  }
 
-    public Boolean getCycles() {
-        return cycles;
-    }
+  public String getReset_by() {
+    return reset_by;
+  }
 
-    public void setCycles(Boolean cycles) {
-        this.cycles = cycles;
-    }
+  public void setReset_by(String reset_by) {
+    this.reset_by = reset_by;
+  }
 
-    public String getReset_by() {
-        return reset_by;
-    }
+  public Boolean getPublicc() {
+    return publicc;
+  }
 
-    public void setReset_by(String reset_by) {
-        this.reset_by = reset_by;
-    }
+  public void setPublicc(Boolean publicc) {
+    this.publicc = publicc;
+  }
 
-    public Boolean getPublicc() {
-        return publicc;
-    }
+  public String getDepends_on_table() {
+    return depends_on_table;
+  }
 
-    public void setPublicc(Boolean publicc) {
-        this.publicc = publicc;
-    }
+  public void setDepends_on_table(String depends_on_table) {
+    this.depends_on_table = depends_on_table;
+  }
 
-    public String getDepends_on_table() {
-        return depends_on_table;
-    }
+  public String getDepends_on_view() {
+    return depends_on_view;
+  }
 
-    public void setDepends_on_table(String depends_on_table) {
-        this.depends_on_table = depends_on_table;
-    }
+  public void setDepends_on_view(String depends_on_view) {
+    this.depends_on_view = depends_on_view;
+  }
 
-    public String getDepends_on_view() {
-        return depends_on_view;
-    }
+  public List<String> getDepends_on() {
+    return depends_on;
+  }
 
-    public void setDepends_on_view(String depends_on_view) {
-        this.depends_on_view = depends_on_view;
-    }
-
-    public List<String> getDepends_on() {
-        return depends_on;
-    }
-
-    public void setDepends_on(List<String> depends_on) {
-        this.depends_on = depends_on;
-    }
+  public void setDepends_on(List<String> depends_on) {
+    this.depends_on = depends_on;
+  }
 }

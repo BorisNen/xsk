@@ -20,30 +20,32 @@ import com.sap.xsk.hdb.ds.model.XSKDataStructureModel;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AbstractDataStructureManagerService<T extends XSKDataStructureModel> implements IXSKDataStructureManager<T> {
+public abstract class AbstractDataStructureManagerService<T extends XSKDataStructureModel>
+    implements IXSKDataStructureManager<T> {
 
-    @Inject
-    @Named("xskDataStructuresCoreService")
-    private IXSKDataStructuresCoreService xskDataStructuresCoreService;
+  @Inject
+  @Named("xskDataStructuresCoreService")
+  private IXSKDataStructuresCoreService xskDataStructuresCoreService;
 
-    @Override
-    public void cleanup() throws XSKDataStructuresException {
-        List<String> dtLocations = xskDataStructuresCoreService.getDataStructuresByType(getDataStructureType()).stream()
-                .map(XSKDataStructureModel::getLocation)
-                .filter(location -> !this.getDataStructureSynchronized().contains(location))
-                .collect(Collectors.toList());
+  @Override
+  public void cleanup() throws XSKDataStructuresException {
+    List<String> dtLocations =
+        xskDataStructuresCoreService.getDataStructuresByType(getDataStructureType()).stream()
+            .map(XSKDataStructureModel::getLocation)
+            .filter(location -> !this.getDataStructureSynchronized().contains(location))
+            .collect(Collectors.toList());
 
-        for (String dtLocation :
-                dtLocations) {
-            xskDataStructuresCoreService.removeDataStructure(dtLocation);
-        }
+    for (String dtLocation : dtLocations) {
+      xskDataStructuresCoreService.removeDataStructure(dtLocation);
     }
+  }
 
-    public IXSKDataStructuresCoreService getDataStructuresCoreService() {
-        return xskDataStructuresCoreService;
-    }
+  public IXSKDataStructuresCoreService getDataStructuresCoreService() {
+    return xskDataStructuresCoreService;
+  }
 
-    public void setDataStructuresCoreService(IXSKDataStructuresCoreService dataStructuresCoreService) {
-        this.xskDataStructuresCoreService = dataStructuresCoreService;
-    }
+  public void setDataStructuresCoreService(
+      IXSKDataStructuresCoreService dataStructuresCoreService) {
+    this.xskDataStructuresCoreService = dataStructuresCoreService;
+  }
 }

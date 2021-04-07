@@ -47,86 +47,110 @@ import static org.mockito.Mockito.*;
 @PrepareForTest({SqlFactory.class, Configuration.class})
 public class XSKViewProcessorTest extends AbstractGuiceTest {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private Connection mockConnection;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private SqlFactory mockSqlfactory;
-    @Mock
-    private DefaultSqlDialect mockDefaultSqlDialect;
-    @Mock
-    private CreateBranchingBuilder create;
-    @Mock
-    private CreateViewBuilder mockCreateViewBuilder;
-    @Mock
-    private DropBranchingBuilder drop;
-    @Mock
-    private DropViewBuilder mockDropViewBuilder;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private Connection mockConnection;
 
-    @Before
-    public void openMocks() {
-        MockitoAnnotations.initMocks(this);
-    }
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private SqlFactory mockSqlfactory;
 
-    @Test
-    public void executeCreateViewHANAv1Successfully() throws Exception {
-        XSKViewCreateProcessor processorSpy = spy(XSKViewCreateProcessor.class);
-        String hdbviewSample = org.apache.commons.io.IOUtils.toString(XSKViewParserTest.class.getResourceAsStream("/ItemsByOrderHANAv1.hdbview"), StandardCharsets.UTF_8);
+  @Mock private DefaultSqlDialect mockDefaultSqlDialect;
+  @Mock private CreateBranchingBuilder create;
+  @Mock private CreateViewBuilder mockCreateViewBuilder;
+  @Mock private DropBranchingBuilder drop;
+  @Mock private DropViewBuilder mockDropViewBuilder;
 
-        XSKDataStructureHDBViewModel model = XSKDataStructureModelFactory.parseView("hdb_view.db/ItemsByOrderHANAv1.hdbview", hdbviewSample);
-        model.setName("\"MYSCHEMA\".\"hdb_view::ItemsByOrderHANAv1\"");
-        String mockSQL = "testSQLScript";
+  @Before
+  public void openMocks() {
+    MockitoAnnotations.initMocks(this);
+  }
 
-        //PowerMock do not support deep stub calls
-        PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
-        when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
-        when(SqlFactory.getNative(mockConnection).exists(mockConnection, model.getName(), DatabaseArtifactTypes.VIEW)).thenReturn(false);
-        when(SqlFactory.getNative(mockConnection).create()).thenReturn(create);
-        when(SqlFactory.getNative(mockConnection).create().view(any())).thenReturn(mockCreateViewBuilder);
-        when(SqlFactory.getNative(mockConnection).create().view(any()).asSelect(any())).thenReturn(mockCreateViewBuilder);
-        when(SqlFactory.getNative(mockConnection).create().view(any()).asSelect(any()).build()).thenReturn(mockSQL);
-        when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false")).thenReturn("true");
+  @Test
+  public void executeCreateViewHANAv1Successfully() throws Exception {
+    XSKViewCreateProcessor processorSpy = spy(XSKViewCreateProcessor.class);
+    String hdbviewSample =
+        org.apache.commons.io.IOUtils.toString(
+            XSKViewParserTest.class.getResourceAsStream("/ItemsByOrderHANAv1.hdbview"),
+            StandardCharsets.UTF_8);
 
-        processorSpy.execute(mockConnection, model);
-        verify(processorSpy, times(1)).executeSql(mockSQL, mockConnection);
-    }
+    XSKDataStructureHDBViewModel model =
+        XSKDataStructureModelFactory.parseView(
+            "hdb_view.db/ItemsByOrderHANAv1.hdbview", hdbviewSample);
+    model.setName("\"MYSCHEMA\".\"hdb_view::ItemsByOrderHANAv1\"");
+    String mockSQL = "testSQLScript";
 
-    @Test
-    public void executeCreateViewHANAv2Successfully() throws Exception {
-        XSKViewCreateProcessor processorSpy = spy(XSKViewCreateProcessor.class);
-        String hdbviewSample = org.apache.commons.io.IOUtils.toString(XSKViewParserTest.class.getResourceAsStream("/ItemsByOrderHANAv2.hdbview"), StandardCharsets.UTF_8);
+    // PowerMock do not support deep stub calls
+    PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
+    when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
+    when(SqlFactory.getNative(mockConnection)
+            .exists(mockConnection, model.getName(), DatabaseArtifactTypes.VIEW))
+        .thenReturn(false);
+    when(SqlFactory.getNative(mockConnection).create()).thenReturn(create);
+    when(SqlFactory.getNative(mockConnection).create().view(any()))
+        .thenReturn(mockCreateViewBuilder);
+    when(SqlFactory.getNative(mockConnection).create().view(any()).asSelect(any()))
+        .thenReturn(mockCreateViewBuilder);
+    when(SqlFactory.getNative(mockConnection).create().view(any()).asSelect(any()).build())
+        .thenReturn(mockSQL);
+    when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"))
+        .thenReturn("true");
 
-        XSKDataStructureHDBViewModel model = XSKDataStructureModelFactory.parseView("hdb_view.db/ItemsByOrderHANAv2.hdbview", hdbviewSample);
-        model.setRawContent(hdbviewSample);
-        model.setName("\"MYSCHEMA\".\"hdb_view::ItemsByOrderHANAv2\"");
-        String sql = XSKConstants.XSK_HDBVIEW_CREATE + model.getRawContent();
+    processorSpy.execute(mockConnection, model);
+    verify(processorSpy, times(1)).executeSql(mockSQL, mockConnection);
+  }
 
-        PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
-        when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
-        when(SqlFactory.getNative(mockConnection).exists(mockConnection, model.getName(), DatabaseArtifactTypes.VIEW)).thenReturn(false);
-        when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false")).thenReturn("true");
+  @Test
+  public void executeCreateViewHANAv2Successfully() throws Exception {
+    XSKViewCreateProcessor processorSpy = spy(XSKViewCreateProcessor.class);
+    String hdbviewSample =
+        org.apache.commons.io.IOUtils.toString(
+            XSKViewParserTest.class.getResourceAsStream("/ItemsByOrderHANAv2.hdbview"),
+            StandardCharsets.UTF_8);
 
-        processorSpy.execute(mockConnection, model);
-        verify(processorSpy, times(1)).executeSql(sql, mockConnection);
-    }
+    XSKDataStructureHDBViewModel model =
+        XSKDataStructureModelFactory.parseView(
+            "hdb_view.db/ItemsByOrderHANAv2.hdbview", hdbviewSample);
+    model.setRawContent(hdbviewSample);
+    model.setName("\"MYSCHEMA\".\"hdb_view::ItemsByOrderHANAv2\"");
+    String sql = XSKConstants.XSK_HDBVIEW_CREATE + model.getRawContent();
 
-    @Test
-    public void executeDropViewSuccessfully() throws Exception {
-        XSKViewDropProcessor processorSpy = spy(XSKViewDropProcessor.class);
-        String hdbviewSample = org.apache.commons.io.IOUtils.toString(XSKViewParserTest.class.getResourceAsStream("/ItemsByOrderHANAv1.hdbview"), StandardCharsets.UTF_8);
+    PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
+    when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
+    when(SqlFactory.getNative(mockConnection)
+            .exists(mockConnection, model.getName(), DatabaseArtifactTypes.VIEW))
+        .thenReturn(false);
+    when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"))
+        .thenReturn("true");
 
-        XSKDataStructureHDBViewModel model = XSKDataStructureModelFactory.parseView("hdb_view/ItemsByOrderHANAv1.hdbview", hdbviewSample);
-        model.setName("\"MYSCHEMA\".\"hdb_view::ItemsByOrderHANAv1\"");
-        String mockSQL = XSKConstants.XSK_HDBVIEW_DROP + model.getName();
+    processorSpy.execute(mockConnection, model);
+    verify(processorSpy, times(1)).executeSql(sql, mockConnection);
+  }
 
-        PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
-        when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
-        when(SqlFactory.getNative(mockConnection).exists(mockConnection, model.getName(), DatabaseArtifactTypes.VIEW)).thenReturn(true);
-        when(SqlFactory.getNative(mockConnection).drop()).thenReturn(drop);
-        when(SqlFactory.getNative(mockConnection).drop().view(any())).thenReturn(mockDropViewBuilder);
-        when(SqlFactory.getNative(mockConnection).drop().view(any()).build()).thenReturn(mockSQL);
-        when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false")).thenReturn("true");
+  @Test
+  public void executeDropViewSuccessfully() throws Exception {
+    XSKViewDropProcessor processorSpy = spy(XSKViewDropProcessor.class);
+    String hdbviewSample =
+        org.apache.commons.io.IOUtils.toString(
+            XSKViewParserTest.class.getResourceAsStream("/ItemsByOrderHANAv1.hdbview"),
+            StandardCharsets.UTF_8);
 
-        processorSpy.execute(mockConnection, model);
-        verify(processorSpy, times(1)).executeSql(mockSQL, mockConnection);
-    }
+    XSKDataStructureHDBViewModel model =
+        XSKDataStructureModelFactory.parseView(
+            "hdb_view/ItemsByOrderHANAv1.hdbview", hdbviewSample);
+    model.setName("\"MYSCHEMA\".\"hdb_view::ItemsByOrderHANAv1\"");
+    String mockSQL = XSKConstants.XSK_HDBVIEW_DROP + model.getName();
+
+    PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
+    when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
+    when(SqlFactory.getNative(mockConnection)
+            .exists(mockConnection, model.getName(), DatabaseArtifactTypes.VIEW))
+        .thenReturn(true);
+    when(SqlFactory.getNative(mockConnection).drop()).thenReturn(drop);
+    when(SqlFactory.getNative(mockConnection).drop().view(any())).thenReturn(mockDropViewBuilder);
+    when(SqlFactory.getNative(mockConnection).drop().view(any()).build()).thenReturn(mockSQL);
+    when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"))
+        .thenReturn("true");
+
+    processorSpy.execute(mockConnection, model);
+    verify(processorSpy, times(1)).executeSql(mockSQL, mockConnection);
+  }
 }

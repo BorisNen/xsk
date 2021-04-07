@@ -26,18 +26,22 @@ import java.sql.SQLException;
 
 import static java.text.MessageFormat.format;
 
-public class HDBProcedureDropProcessor extends AbstractXSKProcessor<XSKDataStructureHDBProcedureModel> {
-    private static final Logger logger = LoggerFactory.getLogger(HDBProcedureDropProcessor.class);
+public class HDBProcedureDropProcessor
+    extends AbstractXSKProcessor<XSKDataStructureHDBProcedureModel> {
+  private static final Logger logger = LoggerFactory.getLogger(HDBProcedureDropProcessor.class);
 
-    public void execute(Connection connection, XSKDataStructureHDBProcedureModel hdbProcedure) throws SQLException {
-        logger.info("Processing Drop Procedure: " + hdbProcedure.getName());
+  public void execute(Connection connection, XSKDataStructureHDBProcedureModel hdbProcedure)
+      throws SQLException {
+    logger.info("Processing Drop Procedure: " + hdbProcedure.getName());
 
-        String procedureName = XSKUtils.escapeArtifactName(hdbProcedure.getName());
-        if (SqlFactory.getNative(connection).exists(connection, procedureName, DatabaseArtifactTypes.PROCEDURE)) {
-            String sql = XSKConstants.XSK_HDBPROCEDURE_DROP + hdbProcedure.getName();
-            executeSql(sql, connection);
-        } else {
-            logger.warn(format("Procedure [{0}] already exists during the drop process", hdbProcedure.getName()));
-        }
+    String procedureName = XSKUtils.escapeArtifactName(hdbProcedure.getName());
+    if (SqlFactory.getNative(connection)
+        .exists(connection, procedureName, DatabaseArtifactTypes.PROCEDURE)) {
+      String sql = XSKConstants.XSK_HDBPROCEDURE_DROP + hdbProcedure.getName();
+      executeSql(sql, connection);
+    } else {
+      logger.warn(
+          format("Procedure [{0}] already exists during the drop process", hdbProcedure.getName()));
     }
+  }
 }

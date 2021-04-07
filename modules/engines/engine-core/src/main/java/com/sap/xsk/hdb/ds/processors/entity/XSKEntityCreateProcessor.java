@@ -32,90 +32,95 @@ import com.sap.xsk.hdb.ds.model.hdbtable.XSKDataStructureHDBTableColumnModel;
 import com.sap.xsk.hdb.ds.model.hdbtable.XSKDataStructureHDBTableConstraintForeignKeyModel;
 import com.sap.xsk.utils.XSKUtils;
 
-/**
- * The Entity Create Processor.
- */
+/** The Entity Create Processor. */
 public class XSKEntityCreateProcessor extends AbstractXSKProcessor<XSKDataStructureEntityModel> {
 
-	private static final Logger logger = LoggerFactory.getLogger(XSKEntityCreateProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(XSKEntityCreateProcessor.class);
 
-	/**
-	 * Execute the corresponding statement.
-	 *
-	 * @param connection the connection
-	 * @param entityModel the entity model
-	 * @throws SQLException the SQL exception
-	 */
-	public void execute(Connection connection, XSKDataStructureEntityModel entityModel) throws SQLException {
-		String tableName = XSKUtils.escapeArtifactName(XSKUtils.getTableName(entityModel));
-		logger.info("Processing Create Table: {}", tableName);
-		CreateTableBuilder createTableBuilder = SqlFactory.getNative(connection).create().table(tableName);
-		List<XSKDataStructureHDBTableColumnModel> columns = entityModel.getColumns();
-		List<String> primaryKeyColumns = new ArrayList<String>();
-		for (XSKDataStructureHDBTableColumnModel columnModel : columns) {
-			String name = XSKUtils.escapeArtifactName(columnModel.getName());
-			DataType type = DataType.valueOf(columnModel.getType());
-			String length = columnModel.getLength();
-			boolean isNullable = columnModel.isNullable();
-			boolean isPrimaryKey = columnModel.isPrimaryKey();
-			boolean isUnique = columnModel.isUnique();
-			String defaultValue = columnModel.getDefaultValue();
-			String precision = columnModel.getPrecision();
-			String scale = columnModel.getScale();
-			String args = "";
-			if (length != null) {
-				if (type.equals(DataType.VARCHAR) || type.equals(DataType.CHAR)
-						|| columnModel.getType().equalsIgnoreCase("NVARCHAR")
-						|| columnModel.getType().equalsIgnoreCase("ALPHANUM")
-						|| columnModel.getType().equalsIgnoreCase("SHORTTEXT")) {
-					args = ISqlKeywords.OPEN + length + ISqlKeywords.CLOSE;
-				}
-			} else if ((precision != null) && (scale != null)) {
-				if (type.equals(DataType.DECIMAL)) {
-					args = ISqlKeywords.OPEN + precision + "," + scale + ISqlKeywords.CLOSE;
-				}
-			}
-			if (defaultValue != null) {
-				if ("".equals(defaultValue)) {
-					if ((type.equals(DataType.VARCHAR) || type.equals(DataType.CHAR))) {
-						args += " DEFAULT '" + defaultValue + "' ";
-					}
-				} else {
-					args += " DEFAULT " + defaultValue + " ";
-				}
+  /**
+   * Execute the corresponding statement.
+   *
+   * @param connection the connection
+   * @param entityModel the entity model
+   * @throws SQLException the SQL exception
+   */
+  public void execute(Connection connection, XSKDataStructureEntityModel entityModel)
+      throws SQLException {
+    String tableName = XSKUtils.escapeArtifactName(XSKUtils.getTableName(entityModel));
+    logger.info("Processing Create Table: {}", tableName);
+    CreateTableBuilder createTableBuilder =
+        SqlFactory.getNative(connection).create().table(tableName);
+    List<XSKDataStructureHDBTableColumnModel> columns = entityModel.getColumns();
+    List<String> primaryKeyColumns = new ArrayList<String>();
+    for (XSKDataStructureHDBTableColumnModel columnModel : columns) {
+      String name = XSKUtils.escapeArtifactName(columnModel.getName());
+      DataType type = DataType.valueOf(columnModel.getType());
+      String length = columnModel.getLength();
+      boolean isNullable = columnModel.isNullable();
+      boolean isPrimaryKey = columnModel.isPrimaryKey();
+      boolean isUnique = columnModel.isUnique();
+      String defaultValue = columnModel.getDefaultValue();
+      String precision = columnModel.getPrecision();
+      String scale = columnModel.getScale();
+      String args = "";
+      if (length != null) {
+        if (type.equals(DataType.VARCHAR)
+            || type.equals(DataType.CHAR)
+            || columnModel.getType().equalsIgnoreCase("NVARCHAR")
+            || columnModel.getType().equalsIgnoreCase("ALPHANUM")
+            || columnModel.getType().equalsIgnoreCase("SHORTTEXT")) {
+          args = ISqlKeywords.OPEN + length + ISqlKeywords.CLOSE;
+        }
+      } else if ((precision != null) && (scale != null)) {
+        if (type.equals(DataType.DECIMAL)) {
+          args = ISqlKeywords.OPEN + precision + "," + scale + ISqlKeywords.CLOSE;
+        }
+      }
+      if (defaultValue != null) {
+        if ("".equals(defaultValue)) {
+          if ((type.equals(DataType.VARCHAR) || type.equals(DataType.CHAR))) {
+            args += " DEFAULT '" + defaultValue + "' ";
+          }
+        } else {
+          args += " DEFAULT " + defaultValue + " ";
+        }
+      }
+      if (isPrimaryKey) {
+        primaryKeyColumns.add(name);
+      }
+      createTableBuilder.column(name, type, false, isNullable, isUnique, args);
+    }
+    if (entityModel.getConstraints() != null) {
+      if (!primaryKeyColumns.isEmpty()) {
+        createTableBuilder.primaryKey(primaryKeyColumns.toArray(new String[] {}));
+      } else if (entityModel.getConstraints().getPrimaryKey() != null) {
+        createTableBuilder.primaryKey(
+            entityModel.getConstraints().getPrimaryKey().getName(),
+            entityModel.getConstraints().getPrimaryKey().getColumns());
+      }
+      if (entityModel.getConstraints().getForeignKeys() != null) {
+        for (XSKDataStructureHDBTableConstraintForeignKeyModel foreignKey :
+            entityModel.getConstraints().getForeignKeys()) {
+          String foreignKeyName = "FK_" + foreignKey.getName();
+          String[] fkColumns = foreignKey.getColumns();
+          String referencedTable =
+              XSKUtils.escapeArtifactName(
+                  XSKUtils.getTableName(entityModel, foreignKey.getReferencedTable()));
+          String[] referencedColumns = foreignKey.getReferencedColumns();
+          foreignKeyName = XSKUtils.escapeArtifactName(foreignKeyName);
+          for (int i = 0; i < fkColumns.length; i++) {
+            fkColumns[i] = XSKUtils.escapeArtifactName(fkColumns[i]);
+          }
+          for (int i = 0; i < referencedColumns.length; i++) {
+            referencedColumns[i] = XSKUtils.escapeArtifactName(referencedColumns[i]);
+          }
+          createTableBuilder.foreignKey(
+              foreignKeyName, fkColumns, referencedTable, referencedColumns);
+        }
+      }
+    }
 
-			}
-			if (isPrimaryKey) {
-				primaryKeyColumns.add(name);
-			}
-			createTableBuilder.column(name, type, false, isNullable, isUnique, args);
-		}
-		if (entityModel.getConstraints() != null) {
-			if (!primaryKeyColumns.isEmpty()) {
-				createTableBuilder.primaryKey(primaryKeyColumns.toArray(new String[] {}));
-			} else if (entityModel.getConstraints().getPrimaryKey() != null) {
-				createTableBuilder.primaryKey(entityModel.getConstraints().getPrimaryKey().getName(), entityModel.getConstraints().getPrimaryKey().getColumns());
-			}
-			if (entityModel.getConstraints().getForeignKeys() != null) {
-				for (XSKDataStructureHDBTableConstraintForeignKeyModel foreignKey : entityModel.getConstraints().getForeignKeys()) {
-					String foreignKeyName = "FK_" + foreignKey.getName();
-					String[] fkColumns = foreignKey.getColumns();
-					String referencedTable = XSKUtils.escapeArtifactName(XSKUtils.getTableName(entityModel, foreignKey.getReferencedTable()));
-					String[] referencedColumns = foreignKey.getReferencedColumns();
-						foreignKeyName = XSKUtils.escapeArtifactName(foreignKeyName);
-						for (int i=0;i<fkColumns.length;i++) {
-							fkColumns[i] =XSKUtils.escapeArtifactName(fkColumns[i]);
-						}
-						for (int i=0;i<referencedColumns.length;i++) {
-							referencedColumns[i] = XSKUtils.escapeArtifactName(referencedColumns[i]);
-						}
-					createTableBuilder.foreignKey(foreignKeyName, fkColumns, referencedTable, referencedColumns);
-				}
-			}
-		}
-
-		String sql = createTableBuilder.build();
-		executeSql(sql, connection);
-	}
-
+    String sql = createTableBuilder.build();
+    executeSql(sql, connection);
+  }
 }

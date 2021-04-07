@@ -19,38 +19,39 @@ import com.sap.xsk.xsaccess.ds.api.XSKAccessException;
 import com.sap.xsk.xsaccess.ds.model.access.XSKAccessDefinition;
 
 public class XSKAccessVerifier {
-	
-    private static final Logger logger = LoggerFactory.getLogger(XSKAccessVerifier.class);
 
-    /**
-     * Checks whether the URI is secured via the *.access file or not
-     *
-     * @param ixskAccessCoreService
-     *            the security core service
-     * @param path
-     *            the path
-     * @param method
-     *            the method
-     * @return all the most specific AccessDefinition entry matching the URI if any
-     * @throws XSKAccessException
-     *             the access exception
-     */
-    public static XSKAccessDefinition getMatchingAccessDefinitions(IXSKAccessCoreService ixskAccessCoreService, String path, String method)
-            throws XSKAccessException {
-        XSKAccessDefinition current = null;
-        for (XSKAccessDefinition xskAccessDefinition : ixskAccessCoreService.getAccessXSKDefinitions()) {
-            if (path.startsWith(xskAccessDefinition.getPath())) {
-                logger.debug(String.format("URI [%s] with HTTP method [%s] is secured because of definition: %s", path, method,
-                        xskAccessDefinition.getPath()));
-                if ((current == null) || (xskAccessDefinition.getPath().length() > current.getPath().length())) {
-                    current = xskAccessDefinition;
-                }
-            }
-        }
-        if (current == null) {
-            logger.trace(String.format("URI [%s] with HTTP method [%s] is NOT secured", path, method));
-        }
+  private static final Logger logger = LoggerFactory.getLogger(XSKAccessVerifier.class);
 
-        return current;
+  /**
+   * Checks whether the URI is secured via the *.access file or not
+   *
+   * @param ixskAccessCoreService the security core service
+   * @param path the path
+   * @param method the method
+   * @return all the most specific AccessDefinition entry matching the URI if any
+   * @throws XSKAccessException the access exception
+   */
+  public static XSKAccessDefinition getMatchingAccessDefinitions(
+      IXSKAccessCoreService ixskAccessCoreService, String path, String method)
+      throws XSKAccessException {
+    XSKAccessDefinition current = null;
+    for (XSKAccessDefinition xskAccessDefinition :
+        ixskAccessCoreService.getAccessXSKDefinitions()) {
+      if (path.startsWith(xskAccessDefinition.getPath())) {
+        logger.debug(
+            String.format(
+                "URI [%s] with HTTP method [%s] is secured because of definition: %s",
+                path, method, xskAccessDefinition.getPath()));
+        if ((current == null)
+            || (xskAccessDefinition.getPath().length() > current.getPath().length())) {
+          current = xskAccessDefinition;
+        }
+      }
     }
+    if (current == null) {
+      logger.trace(String.format("URI [%s] with HTTP method [%s] is NOT secured", path, method));
+    }
+
+    return current;
+  }
 }

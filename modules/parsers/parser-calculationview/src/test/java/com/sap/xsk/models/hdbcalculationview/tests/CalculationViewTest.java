@@ -30,47 +30,48 @@ import com.sap.ndb.DataSources;
 import com.sap.ndb.DataSources.DataSource;
 
 public class CalculationViewTest {
-	
-	@Test
-	public void serialize() throws JAXBException {
-		
-		CalculationScenario calculationScenario = new CalculationScenario();
-		calculationScenario.setId("com.sap.xsk.samples::XSK_SIMPLE_CALC_VIEW");
-		calculationScenario.setOutputViewType("Projection");
-		DataSource dataSource = new DataSource();
-		dataSource.setId("XSK_SIMPLE_TABLE");
-		dataSource.setResourceUri("XSK_SIMPLE_TABLE");
-		DataSources dataSources = new DataSources();
-		dataSources.getDataSource().add(dataSource);
-		calculationScenario.setDataSources(dataSources);
-		
-		StringWriter writer = new StringWriter();
-		JAXBContext context = JAXBContext.newInstance(CalculationScenario.class);
-		Marshaller m = context.createMarshaller();
-		m.marshal(calculationScenario, writer);
-		
-		System.out.println(writer.toString());
 
-	}
-	
-	@Test
-	public void deserialize() throws JAXBException {
-		String xml = "";
-		try {
-			xml = org.apache.commons.io.IOUtils.toString(CalculationViewTest.class.getResourceAsStream("/test.calculationview"));
-		} catch (IOException e) {
-			fail("Parsing of calculation view failed.");
-			e.printStackTrace();
-		}
-		
-		xml = xml.replace("<Calculation:scenario", "<CalculationScenario");
-		xml = xml.replace("</Calculation:scenario>", "</CalculationScenario>");
-		
-		JAXBContext context = JAXBContext.newInstance(CalculationScenario.class);
-		Unmarshaller um = context.createUnmarshaller();
-		CalculationScenario calculationScenario = (CalculationScenario) um.unmarshal(new StringReader(xml));
-		
-		assertEquals(calculationScenario.getId(), "PO_HEADER");
-	}
+  @Test
+  public void serialize() throws JAXBException {
 
+    CalculationScenario calculationScenario = new CalculationScenario();
+    calculationScenario.setId("com.sap.xsk.samples::XSK_SIMPLE_CALC_VIEW");
+    calculationScenario.setOutputViewType("Projection");
+    DataSource dataSource = new DataSource();
+    dataSource.setId("XSK_SIMPLE_TABLE");
+    dataSource.setResourceUri("XSK_SIMPLE_TABLE");
+    DataSources dataSources = new DataSources();
+    dataSources.getDataSource().add(dataSource);
+    calculationScenario.setDataSources(dataSources);
+
+    StringWriter writer = new StringWriter();
+    JAXBContext context = JAXBContext.newInstance(CalculationScenario.class);
+    Marshaller m = context.createMarshaller();
+    m.marshal(calculationScenario, writer);
+
+    System.out.println(writer.toString());
+  }
+
+  @Test
+  public void deserialize() throws JAXBException {
+    String xml = "";
+    try {
+      xml =
+          org.apache.commons.io.IOUtils.toString(
+              CalculationViewTest.class.getResourceAsStream("/test.calculationview"));
+    } catch (IOException e) {
+      fail("Parsing of calculation view failed.");
+      e.printStackTrace();
+    }
+
+    xml = xml.replace("<Calculation:scenario", "<CalculationScenario");
+    xml = xml.replace("</Calculation:scenario>", "</CalculationScenario>");
+
+    JAXBContext context = JAXBContext.newInstance(CalculationScenario.class);
+    Unmarshaller um = context.createUnmarshaller();
+    CalculationScenario calculationScenario =
+        (CalculationScenario) um.unmarshal(new StringReader(xml));
+
+    assertEquals(calculationScenario.getId(), "PO_HEADER");
+  }
 }

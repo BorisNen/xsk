@@ -25,26 +25,28 @@ import com.sap.xsk.hdb.ds.model.hdi.XSKDataStructureHDIModel;
 import com.sap.xsk.hdb.ds.parser.XSKDataStructureParser;
 
 public class XSKHDIParser implements XSKDataStructureParser {
-    @Override
-    public XSKDataStructureHDIModel parse(String location, String content) throws XSKDataStructuresException, IOException {
-    	XSKDataStructureHDIModel hdiModel = GsonHelper.GSON.fromJson(content, XSKDataStructureHDIModel.class);
-        hdiModel.setName(new File(location).getName());
-        hdiModel.setLocation(location);
-        hdiModel.setType(getType());
-        hdiModel.setHash(DigestUtils.md5Hex(content));
-        hdiModel.setCreatedBy(UserFacade.getName());
-        hdiModel.setCreatedAt(new Timestamp(new java.util.Date().getTime()));
-        hdiModel.setContent(content);
-        return hdiModel;
-    }
+  @Override
+  public XSKDataStructureHDIModel parse(String location, String content)
+      throws XSKDataStructuresException, IOException {
+    XSKDataStructureHDIModel hdiModel =
+        GsonHelper.GSON.fromJson(content, XSKDataStructureHDIModel.class);
+    hdiModel.setName(new File(location).getName());
+    hdiModel.setLocation(location);
+    hdiModel.setType(getType());
+    hdiModel.setHash(DigestUtils.md5Hex(content));
+    hdiModel.setCreatedBy(UserFacade.getName());
+    hdiModel.setCreatedAt(new Timestamp(new java.util.Date().getTime()));
+    hdiModel.setContent(content);
+    return hdiModel;
+  }
 
-    @Override
-    public String getType() {
-        return IXSKDataStructureModel.TYPE_HDI;
-    }
+  @Override
+  public String getType() {
+    return IXSKDataStructureModel.TYPE_HDI;
+  }
 
-    @Override
-    public Class getDataStructureClass() {
-        return XSKDataStructureHDIModel.class;
-    }
+  @Override
+  public Class getDataStructureClass() {
+    return XSKDataStructureHDIModel.class;
+  }
 }

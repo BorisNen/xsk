@@ -42,94 +42,97 @@ import com.sap.xsk.hdbti.transformer.XSKTableImportArtifactFactory;
 @Singleton
 public class XSKTableImportCoreService implements IXSKTableImportCoreService {
 
-    private static final Logger logger = LoggerFactory.getLogger(XSKTableImportCoreService.class);
+  private static final Logger logger = LoggerFactory.getLogger(XSKTableImportCoreService.class);
 
-    @Inject
-    private XSKTableImportArtifactFactory xskTableImportArtifactFactory;
+  @Inject private XSKTableImportArtifactFactory xskTableImportArtifactFactory;
 
-    private DataSource dataSource = StaticInjector.getInjector().getInstance(DataSource.class);
+  private DataSource dataSource = StaticInjector.getInjector().getInstance(DataSource.class);
 
-    @Inject
-    private PersistenceManager<XSKTableImportArtifact> xskPersistenceManager;
+  @Inject private PersistenceManager<XSKTableImportArtifact> xskPersistenceManager;
 
-    @Override
-    public XSKTableImportArtifact createTableImportArtifact(XSKTableImportArtifact xskTableImportArtifact) throws XSKTableImportException {
+  @Override
+  public XSKTableImportArtifact createTableImportArtifact(
+      XSKTableImportArtifact xskTableImportArtifact) throws XSKTableImportException {
 
-        try (Connection connection = dataSource.getConnection()) {
-            xskPersistenceManager.insert(connection, xskTableImportArtifact);
-            return xskTableImportArtifact;
-        } catch (SQLException e) {
-            throw new XSKTableImportException(e);
-        }
+    try (Connection connection = dataSource.getConnection()) {
+      xskPersistenceManager.insert(connection, xskTableImportArtifact);
+      return xskTableImportArtifact;
+    } catch (SQLException e) {
+      throw new XSKTableImportException(e);
     }
+  }
 
-    @Override
-    public void updateTableImportArtifact(XSKTableImportArtifact artifact) throws XSKTableImportException {
-        try (Connection connection = dataSource.getConnection()) {
-            XSKTableImportArtifact tableImportArtifact = getTableImportArtifact(artifact.getLocation());
-            tableImportArtifact.setName(artifact.getName());
-            tableImportArtifact.setHash(artifact.getHash());
-            xskPersistenceManager.update(connection, tableImportArtifact);
-        } catch (SQLException e) {
-            throw new XSKTableImportException(e);
-        }
+  @Override
+  public void updateTableImportArtifact(XSKTableImportArtifact artifact)
+      throws XSKTableImportException {
+    try (Connection connection = dataSource.getConnection()) {
+      XSKTableImportArtifact tableImportArtifact = getTableImportArtifact(artifact.getLocation());
+      tableImportArtifact.setName(artifact.getName());
+      tableImportArtifact.setHash(artifact.getHash());
+      xskPersistenceManager.update(connection, tableImportArtifact);
+    } catch (SQLException e) {
+      throw new XSKTableImportException(e);
     }
+  }
 
-    @Override
-    public XSKTableImportArtifact getTableImportArtifact(String location) throws XSKTableImportException {
-        try (Connection connection = dataSource.getConnection()) {
-            return xskPersistenceManager.find(connection, XSKTableImportArtifact.class, location);
-        } catch (SQLException e) {
-            throw new XSKTableImportException(e);
-        }
+  @Override
+  public XSKTableImportArtifact getTableImportArtifact(String location)
+      throws XSKTableImportException {
+    try (Connection connection = dataSource.getConnection()) {
+      return xskPersistenceManager.find(connection, XSKTableImportArtifact.class, location);
+    } catch (SQLException e) {
+      throw new XSKTableImportException(e);
     }
+  }
 
-    @Override
-    public void removeTableImportArtifact(String location) {
-        try (Connection connection = dataSource.getConnection()) {
-            xskPersistenceManager.delete(connection, XSKTableImportArtifact.class, location);
-        } catch (SQLException e) {
-            logger.error("Error cleaning up and HDBTI file from DB", e);
-        }
+  @Override
+  public void removeTableImportArtifact(String location) {
+    try (Connection connection = dataSource.getConnection()) {
+      xskPersistenceManager.delete(connection, XSKTableImportArtifact.class, location);
+    } catch (SQLException e) {
+      logger.error("Error cleaning up and HDBTI file from DB", e);
     }
+  }
 
-    @Override
-    public List<XSKTableImportArtifact> getTableImportArtifacts() throws XSKTableImportException {
-        try (Connection connection = dataSource.getConnection()) {
-            return xskPersistenceManager.findAll(connection, XSKTableImportArtifact.class);
-        } catch (SQLException e) {
-            logger.error("Error getting the HDBTI artifacts from DB");
-            throw new XSKTableImportException(e);
-        }
+  @Override
+  public List<XSKTableImportArtifact> getTableImportArtifacts() throws XSKTableImportException {
+    try (Connection connection = dataSource.getConnection()) {
+      return xskPersistenceManager.findAll(connection, XSKTableImportArtifact.class);
+    } catch (SQLException e) {
+      logger.error("Error getting the HDBTI artifacts from DB");
+      throw new XSKTableImportException(e);
     }
+  }
 
-    @Override
-    public boolean existsTableImportArtifact(String location) throws XSKTableImportException {
-        return getTableImportArtifact(location) != null;
+  @Override
+  public boolean existsTableImportArtifact(String location) throws XSKTableImportException {
+    return getTableImportArtifact(location) != null;
+  }
+
+  @Override
+  public XSKTableImportArtifact parseTableImportArtifact(String location, String content)
+      throws IOException, XSKHDBTISyntaxErrorException {
+    XSKTableImportArtifact parsedArtifact =
+        xskTableImportArtifactFactory.parseTableImport(content, location);
+    parsedArtifact.setName(new File(location).getName());
+    parsedArtifact.setLocation(location);
+    parsedArtifact.setType(TYPE_HDBTI);
+    parsedArtifact.setHash(DigestUtils.md5Hex(content));
+    parsedArtifact.setCreatedBy(UserFacade.getName());
+    parsedArtifact.setCreatedAt(new Timestamp(new java.util.Date().getTime()));
+    return parsedArtifact;
+  }
+
+  boolean caseSensitive =
+      Boolean.parseBoolean(
+          Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"));
+
+  public String convertToActualTableName(String tableName) {
+    if (caseSensitive) {
+      tableName = "\"" + tableName + "\"";
     }
-
-    @Override
-    public XSKTableImportArtifact parseTableImportArtifact(String location, String content) throws IOException, XSKHDBTISyntaxErrorException {
-        XSKTableImportArtifact parsedArtifact = xskTableImportArtifactFactory.parseTableImport(content, location);
-        parsedArtifact.setName(new File(location).getName());
-        parsedArtifact.setLocation(location);
-        parsedArtifact.setType(TYPE_HDBTI);
-        parsedArtifact.setHash(DigestUtils.md5Hex(content));
-        parsedArtifact.setCreatedBy(UserFacade.getName());
-        parsedArtifact.setCreatedAt(new Timestamp(new java.util.Date().getTime()));
-        return parsedArtifact;
-    }
-
-    boolean caseSensitive = Boolean.parseBoolean(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"));
-
-    public String convertToActualTableName(String tableName) {
-        if (caseSensitive) {
-            tableName = "\"" + tableName + "\"";
-        }
-        return tableName;
-//        return tableName.substring(tableName.lastIndexOf(':') + 1).replace('.', '_').toUpperCase();
-    }
-
-
-
+    return tableName;
+    //        return tableName.substring(tableName.lastIndexOf(':') + 1).replace('.',
+    // '_').toUpperCase();
+  }
 }

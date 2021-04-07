@@ -17,81 +17,90 @@ import java.util.List;
 import java.util.Objects;
 
 public class XSKHDBVIEWDefinitionModel {
-    private String schema;
-    private String query;
-    private boolean publicProp = true;
-    private List<String> dependsOn;
-    private List<String> dependsOnTable;
-    private List<String> dependsOnView;
+  private String schema;
+  private String query;
+  private boolean publicProp = true;
+  private List<String> dependsOn;
+  private List<String> dependsOnTable;
+  private List<String> dependsOnView;
 
-    public String getSchema() {
-        return schema;
-    }
+  public String getSchema() {
+    return schema;
+  }
 
-    public void setSchema(String schema) {
-        this.schema = schema;
-    }
+  public void setSchema(String schema) {
+    this.schema = schema;
+  }
 
-    public String getQuery() {
-        return query;
-    }
+  public String getQuery() {
+    return query;
+  }
 
-    public void setQuery(String query) {
-        this.query = query;
-    }
+  public void setQuery(String query) {
+    this.query = query;
+  }
 
-    public boolean isPublic() {
-        return publicProp;
-    }
+  public boolean isPublic() {
+    return publicProp;
+  }
 
-    public void setPublic(boolean publicProp) {
-        this.publicProp = publicProp;
-    }
+  public void setPublic(boolean publicProp) {
+    this.publicProp = publicProp;
+  }
 
-    public List<String> getDependsOn() {
-        return dependsOn;
-    }
+  public List<String> getDependsOn() {
+    return dependsOn;
+  }
 
-    public void setDependsOn(List<String> dependsOn) {
-        this.dependsOn = dependsOn;
-    }
+  public void setDependsOn(List<String> dependsOn) {
+    this.dependsOn = dependsOn;
+  }
 
-    public List<String> getDependsOnTable() {
-        return dependsOnTable;
-    }
+  public List<String> getDependsOnTable() {
+    return dependsOnTable;
+  }
 
-    public void setDependsOnTable(List<String> dependsOnTable) {
-        this.dependsOnTable = dependsOnTable;
-    }
+  public void setDependsOnTable(List<String> dependsOnTable) {
+    this.dependsOnTable = dependsOnTable;
+  }
 
-    public List<String> getDependsOnView() {
-        return dependsOnView;
-    }
+  public List<String> getDependsOnView() {
+    return dependsOnView;
+  }
 
-    public void setDependsOnView(List<String> dependsOnView) {
-        this.dependsOnView = dependsOnView;
-    }
+  public void setDependsOnView(List<String> dependsOnView) {
+    this.dependsOnView = dependsOnView;
+  }
 
-    public void checkForAllMandatoryFieldsPresence() throws Exception {
-        checkPresence(schema, "schema");
-        checkPresence(query, "query");
-    }
+  public void checkForAllMandatoryFieldsPresence() throws Exception {
+    checkPresence(schema, "schema");
+    checkPresence(query, "query");
+  }
 
-    private <T> void checkPresence(T field, String fieldName) {
-        if (Objects.isNull(field)) {
-            throw new XSKHDBViewMissingPropertyException(String.format("Missing mandatory field %s!", fieldName));
-        }
+  private <T> void checkPresence(T field, String fieldName) {
+    if (Objects.isNull(field)) {
+      throw new XSKHDBViewMissingPropertyException(
+          String.format("Missing mandatory field %s!", fieldName));
     }
+  }
 
-    @Override
-    public String toString() {
-        return "HdbviewDefinitionModel{" +
-                "schema='" + schema + '\'' +
-                ", query='" + query + '\'' +
-                ", publicProp=" + publicProp +
-                ", dependsOn=" + dependsOn +
-                ", dependsOnTable=" + dependsOnTable +
-                ", dependsOnView=" + dependsOnView +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "HdbviewDefinitionModel{"
+        + "schema='"
+        + schema
+        + '\''
+        + ", query='"
+        + query
+        + '\''
+        + ", publicProp="
+        + publicProp
+        + ", dependsOn="
+        + dependsOn
+        + ", dependsOnTable="
+        + dependsOnTable
+        + ", dependsOnView="
+        + dependsOnView
+        + '}';
+  }
 }

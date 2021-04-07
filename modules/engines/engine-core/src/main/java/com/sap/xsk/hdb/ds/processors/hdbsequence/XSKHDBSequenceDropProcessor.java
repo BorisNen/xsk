@@ -26,35 +26,42 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class XSKHDBSequenceDropProcessor extends AbstractXSKProcessor<XSKDataStructureHDBSequenceModel> {
-    private static final Logger logger = LoggerFactory.getLogger(XSKHDBSequenceDropProcessor.class);
+public class XSKHDBSequenceDropProcessor
+    extends AbstractXSKProcessor<XSKDataStructureHDBSequenceModel> {
+  private static final Logger logger = LoggerFactory.getLogger(XSKHDBSequenceDropProcessor.class);
 
-    @Override
-    public void execute(Connection connection, XSKDataStructureHDBSequenceModel hdbSequenceModel) throws SQLException {
+  @Override
+  public void execute(Connection connection, XSKDataStructureHDBSequenceModel hdbSequenceModel)
+      throws SQLException {
 
-        boolean caseSensitive = Boolean.parseBoolean(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"));
-        String hdbSequenceName = hdbSequenceModel.getName();
-        if (caseSensitive) {
-            hdbSequenceName = "\"" + hdbSequenceName + "\"";
-        }
-        logger.info("Processing Drop HdbSequence: " + hdbSequenceName);
-
-        if (SqlFactory.getNative(connection).exists(connection, hdbSequenceName, DatabaseArtifactTypes.SEQUENCE)){
-            String sql = (hdbSequenceModel.getHanaVersion() == XSKHanaVersion.VERSION_1)
-                                ? getHanav1ModelSQL(hdbSequenceName)
-                                : XSKConstants.XSK_HDBSEQUENCE_DROP + hdbSequenceModel.getRawContent();
-            executeSql(sql, connection);
-        }
+    boolean caseSensitive =
+        Boolean.parseBoolean(
+            Configuration.get(
+                IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"));
+    String hdbSequenceName = hdbSequenceModel.getName();
+    if (caseSensitive) {
+      hdbSequenceName = "\"" + hdbSequenceName + "\"";
     }
+    logger.info("Processing Drop HdbSequence: " + hdbSequenceName);
 
-    private String getHanav1ModelSQL(String modifiedSequenceName){
-        return new StringBuilder()
-                .append("DROP SEQUENCE")
-                .append(" ")
-                .append(modifiedSequenceName)
-                .append(" ")
-                .append("RESTRICT")
-                .append(";")
-                .toString();
+    if (SqlFactory.getNative(connection)
+        .exists(connection, hdbSequenceName, DatabaseArtifactTypes.SEQUENCE)) {
+      String sql =
+          (hdbSequenceModel.getHanaVersion() == XSKHanaVersion.VERSION_1)
+              ? getHanav1ModelSQL(hdbSequenceName)
+              : XSKConstants.XSK_HDBSEQUENCE_DROP + hdbSequenceModel.getRawContent();
+      executeSql(sql, connection);
     }
+  }
+
+  private String getHanav1ModelSQL(String modifiedSequenceName) {
+    return new StringBuilder()
+        .append("DROP SEQUENCE")
+        .append(" ")
+        .append(modifiedSequenceName)
+        .append(" ")
+        .append("RESTRICT")
+        .append(";")
+        .toString();
+  }
 }

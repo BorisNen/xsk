@@ -25,72 +25,97 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
-public class IXSKSynonymManagerService extends AbstractDataStructureManagerService<XSKDataStructureHDBSynonymModel> {
-    private static final Logger logger = LoggerFactory.getLogger(IXSKSynonymManagerService.class);
+public class IXSKSynonymManagerService
+    extends AbstractDataStructureManagerService<XSKDataStructureHDBSynonymModel> {
+  private static final Logger logger = LoggerFactory.getLogger(IXSKSynonymManagerService.class);
 
-    @Inject
-    @Named("xskSynonymCreateProcessor")
-    private IXSKHdbProcessor xskSynonymCreateProcessor;
+  @Inject
+  @Named("xskSynonymCreateProcessor")
+  private IXSKHdbProcessor xskSynonymCreateProcessor;
 
-    @Inject
-    @Named("xskSynonymDropProcessor")
-    private IXSKHdbProcessor xskSynonymDropProcessor;
+  @Inject
+  @Named("xskSynonymDropProcessor")
+  private IXSKHdbProcessor xskSynonymDropProcessor;
 
-    private final Map<String, XSKDataStructureHDBSynonymModel> dataStructureSynonymModels = new LinkedHashMap<>();
-    private final List<String> synonymsSynchronized = Collections.synchronizedList(new ArrayList<>());
+  private final Map<String, XSKDataStructureHDBSynonymModel> dataStructureSynonymModels =
+      new LinkedHashMap<>();
+  private final List<String> synonymsSynchronized = Collections.synchronizedList(new ArrayList<>());
 
-
-    @Override
-    public void synchronizeRuntimeMetadata(XSKDataStructureHDBSynonymModel synonymModel) throws XSKDataStructuresException {
-        if (!getDataStructuresCoreService().existsDataStructure(synonymModel.getLocation(), synonymModel.getType())) {
-            getDataStructuresCoreService().createDataStructure(synonymModel.getLocation(), synonymModel.getName(), synonymModel.getHash(), synonymModel.getType());
-            dataStructureSynonymModels.put(synonymModel.getName(), synonymModel);
-            logger.info("Synchronized a new Synonym file [{}] from location: {}", synonymModel.getName(), synonymModel.getLocation());
-        } else {
-            XSKDataStructureHDBSynonymModel existing = getDataStructuresCoreService().getDataStructure(synonymModel.getLocation(), synonymModel.getType());
-            if (!synonymModel.equals(existing)) {
-                getDataStructuresCoreService().updateDataStructure(synonymModel.getLocation(), synonymModel.getName(), synonymModel.getHash(), synonymModel.getType());
-                dataStructureSynonymModels.put(synonymModel.getName(), synonymModel);
-                logger.info("Synchronized a modified Synonym file [{}] from location: {}", synonymModel.getName(), synonymModel.getLocation());
-            }
-        }
-        if (!synonymsSynchronized.contains(synonymModel.getLocation())) {
-            synonymsSynchronized.add(synonymModel.getLocation());
-        }
+  @Override
+  public void synchronizeRuntimeMetadata(XSKDataStructureHDBSynonymModel synonymModel)
+      throws XSKDataStructuresException {
+    if (!getDataStructuresCoreService()
+        .existsDataStructure(synonymModel.getLocation(), synonymModel.getType())) {
+      getDataStructuresCoreService()
+          .createDataStructure(
+              synonymModel.getLocation(),
+              synonymModel.getName(),
+              synonymModel.getHash(),
+              synonymModel.getType());
+      dataStructureSynonymModels.put(synonymModel.getName(), synonymModel);
+      logger.info(
+          "Synchronized a new Synonym file [{}] from location: {}",
+          synonymModel.getName(),
+          synonymModel.getLocation());
+    } else {
+      XSKDataStructureHDBSynonymModel existing =
+          getDataStructuresCoreService()
+              .getDataStructure(synonymModel.getLocation(), synonymModel.getType());
+      if (!synonymModel.equals(existing)) {
+        getDataStructuresCoreService()
+            .updateDataStructure(
+                synonymModel.getLocation(),
+                synonymModel.getName(),
+                synonymModel.getHash(),
+                synonymModel.getType());
+        dataStructureSynonymModels.put(synonymModel.getName(), synonymModel);
+        logger.info(
+            "Synchronized a modified Synonym file [{}] from location: {}",
+            synonymModel.getName(),
+            synonymModel.getLocation());
+      }
     }
-
-    @Override
-    public void createDataStructure(Connection connection, XSKDataStructureHDBSynonymModel synonymModel) throws SQLException {
-        this.xskSynonymCreateProcessor.execute(connection, synonymModel);
+    if (!synonymsSynchronized.contains(synonymModel.getLocation())) {
+      synonymsSynchronized.add(synonymModel.getLocation());
     }
+  }
 
-    @Override
-    public void dropDataStructure(Connection connection, XSKDataStructureHDBSynonymModel synonymModel) throws SQLException {
-        this.xskSynonymDropProcessor.execute(connection, synonymModel);
-    }
+  @Override
+  public void createDataStructure(
+      Connection connection, XSKDataStructureHDBSynonymModel synonymModel) throws SQLException {
+    this.xskSynonymCreateProcessor.execute(connection, synonymModel);
+  }
 
-    @Override
-    public void updateDataStructure(Connection connection, XSKDataStructureHDBSynonymModel synonymModel) throws SQLException, OperationNotSupportedException {
-        throw new OperationNotSupportedException();
-    }
+  @Override
+  public void dropDataStructure(Connection connection, XSKDataStructureHDBSynonymModel synonymModel)
+      throws SQLException {
+    this.xskSynonymDropProcessor.execute(connection, synonymModel);
+  }
 
-    @Override
-    public Map<String, XSKDataStructureHDBSynonymModel> getDataStructureModels() {
-        return Collections.unmodifiableMap(this.dataStructureSynonymModels);
-    }
+  @Override
+  public void updateDataStructure(
+      Connection connection, XSKDataStructureHDBSynonymModel synonymModel)
+      throws SQLException, OperationNotSupportedException {
+    throw new OperationNotSupportedException();
+  }
 
-    @Override
-    public List<String> getDataStructureSynchronized() {
-        return Collections.unmodifiableList(this.synonymsSynchronized);
-    }
+  @Override
+  public Map<String, XSKDataStructureHDBSynonymModel> getDataStructureModels() {
+    return Collections.unmodifiableMap(this.dataStructureSynonymModels);
+  }
 
-    @Override
-    public String getDataStructureType() {
-        return IXSKDataStructureModel.FILE_EXTENSION_SYNONYM;
-    }
+  @Override
+  public List<String> getDataStructureSynchronized() {
+    return Collections.unmodifiableList(this.synonymsSynchronized);
+  }
 
-    @Override
-    public void clearCache() {
-        dataStructureSynonymModels.clear();
-    }
+  @Override
+  public String getDataStructureType() {
+    return IXSKDataStructureModel.FILE_EXTENSION_SYNONYM;
+  }
+
+  @Override
+  public void clearCache() {
+    dataStructureSynonymModels.clear();
+  }
 }

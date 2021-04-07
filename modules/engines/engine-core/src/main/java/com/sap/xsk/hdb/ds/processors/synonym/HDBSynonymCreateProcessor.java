@@ -24,30 +24,40 @@ import java.sql.SQLException;
 
 import static java.text.MessageFormat.format;
 
+public class HDBSynonymCreateProcessor
+    extends AbstractXSKProcessor<XSKDataStructureHDBSynonymModel> {
 
-public class HDBSynonymCreateProcessor extends AbstractXSKProcessor<XSKDataStructureHDBSynonymModel> {
+  private static final Logger logger = LoggerFactory.getLogger(HDBSynonymCreateProcessor.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(HDBSynonymCreateProcessor.class);
+  /**
+   * Execute : CREATE [PUBLIC] SYNONYM <synonym_name> FOR <synonym_source_object_name>
+   * <synonym_name> ::= [<schema_name>.]<identifier>
+   * <synonym_source_object_name>:==[<object_schema_name>.]<object_name>
+   *
+   * @see <a
+   *     href="https://help.sap.com/viewer/4fe29514fd584807ac9f2a04f6754767/1.0.12/en-US/20d5412b75191014bc7ec7e133ce5bf5.html">CREATE
+   *     SYNONYM Statement (Data Definition)</a>
+   */
+  @Override
+  public void execute(Connection connection, XSKDataStructureHDBSynonymModel synonymModel)
+      throws SQLException {
+    logger.info("Processing Create Synonym: " + synonymModel.getName());
 
-    /**
-     * Execute :
-     * CREATE [PUBLIC] SYNONYM <synonym_name> FOR <synonym_source_object_name>
-     * <synonym_name> ::= [<schema_name>.]<identifier>
-     * <synonym_source_object_name>:==[<object_schema_name>.]<object_name>
-     *
-     * @see <a href="https://help.sap.com/viewer/4fe29514fd584807ac9f2a04f6754767/1.0.12/en-US/20d5412b75191014bc7ec7e133ce5bf5.html">CREATE SYNONYM Statement (Data Definition)</a>
-     */
-    @Override
-    public void execute(Connection connection, XSKDataStructureHDBSynonymModel synonymModel) throws SQLException {
-        logger.info("Processing Create Synonym: " + synonymModel.getName());
-
-        String synonymName = XSKUtils.escapeArtifactName(synonymModel.getName());
-        String targetObjectName = XSKUtils.escapeArtifactName(synonymModel.getTargetObject(), synonymModel.getTargetSchema());
-        if (!SqlFactory.getNative(connection).exists(connection, synonymModel.getName(), DatabaseArtifactTypes.SYNONYM)) {
-            String sql = SqlFactory.getNative(connection).create().synonym(synonymName).forSource(targetObjectName).build();
-            executeSql(sql, connection);
-        } else {
-            logger.warn(format("Synonym [{0}] already exists during the create process", synonymModel.getName()));
-        }
+    String synonymName = XSKUtils.escapeArtifactName(synonymModel.getName());
+    String targetObjectName =
+        XSKUtils.escapeArtifactName(synonymModel.getTargetObject(), synonymModel.getTargetSchema());
+    if (!SqlFactory.getNative(connection)
+        .exists(connection, synonymModel.getName(), DatabaseArtifactTypes.SYNONYM)) {
+      String sql =
+          SqlFactory.getNative(connection)
+              .create()
+              .synonym(synonymName)
+              .forSource(targetObjectName)
+              .build();
+      executeSql(sql, connection);
+    } else {
+      logger.warn(
+          format("Synonym [{0}] already exists during the create process", synonymModel.getName()));
     }
+  }
 }

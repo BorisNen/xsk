@@ -26,18 +26,25 @@ import java.sql.SQLException;
 
 import static java.text.MessageFormat.format;
 
-public class HDBTableFunctionCreateProcessor extends AbstractXSKProcessor<XSKDataStructureHDBTableFunctionModel> {
-    private static final Logger logger = LoggerFactory.getLogger(HDBTableFunctionCreateProcessor.class);
+public class HDBTableFunctionCreateProcessor
+    extends AbstractXSKProcessor<XSKDataStructureHDBTableFunctionModel> {
+  private static final Logger logger =
+      LoggerFactory.getLogger(HDBTableFunctionCreateProcessor.class);
 
-    public void execute(Connection connection, XSKDataStructureHDBTableFunctionModel hdbTableFunction) throws SQLException {
-        logger.info("Processing Create TableFunction: " + hdbTableFunction.getName());
+  public void execute(Connection connection, XSKDataStructureHDBTableFunctionModel hdbTableFunction)
+      throws SQLException {
+    logger.info("Processing Create TableFunction: " + hdbTableFunction.getName());
 
-        String tableFunctionName = XSKUtils.escapeArtifactName(hdbTableFunction.getName());
-        if (!SqlFactory.getNative(connection).exists(connection, tableFunctionName, DatabaseArtifactTypes.FUNCTION)) {
-            String sql = XSKConstants.XSK_HDBTABLEFUNCTION_CREATE + hdbTableFunction.getContent();
-            executeSql(sql, connection);
-        } else {
-            logger.warn(format("TableFunction [{0}] already exists during the create process", hdbTableFunction.getName()));
-        }
+    String tableFunctionName = XSKUtils.escapeArtifactName(hdbTableFunction.getName());
+    if (!SqlFactory.getNative(connection)
+        .exists(connection, tableFunctionName, DatabaseArtifactTypes.FUNCTION)) {
+      String sql = XSKConstants.XSK_HDBTABLEFUNCTION_CREATE + hdbTableFunction.getContent();
+      executeSql(sql, connection);
+    } else {
+      logger.warn(
+          format(
+              "TableFunction [{0}] already exists during the create process",
+              hdbTableFunction.getName()));
     }
+  }
 }

@@ -17,5 +17,5 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public interface IXSKHdbProcessor<T extends XSKDataStructureModel> {
-    void execute(Connection connection, T entityModel) throws SQLException;
+  void execute(Connection connection, T entityModel) throws SQLException;
 }

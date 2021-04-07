@@ -13,35 +13,33 @@ package com.sap.xsk.hdb.ds.model.hdbsynonym;
 
 import com.sap.xsk.hdb.ds.model.XSKDataStructureModel;
 
-/**
- * The synonym model representation.
- */
+/** The synonym model representation. */
 public class XSKDataStructureHDBSynonymModel extends XSKDataStructureModel {
-    private String targetObject;
-    private String targetSchema;
-    private String synonymSchema;
+  private String targetObject;
+  private String targetSchema;
+  private String synonymSchema;
 
-    public String getTargetObject() {
-        return targetObject;
-    }
+  public String getTargetObject() {
+    return targetObject;
+  }
 
-    public void setTargetObject(String targetObject) {
-        this.targetObject = targetObject;
-    }
+  public void setTargetObject(String targetObject) {
+    this.targetObject = targetObject;
+  }
 
-    public String getTargetSchema() {
-        return targetSchema;
-    }
+  public String getTargetSchema() {
+    return targetSchema;
+  }
 
-    public void setTargetSchema(String targetSchema) {
-        this.targetSchema = targetSchema;
-    }
+  public void setTargetSchema(String targetSchema) {
+    this.targetSchema = targetSchema;
+  }
 
-    public String getSynonymSchema() {
-        return synonymSchema;
-    }
+  public String getSynonymSchema() {
+    return synonymSchema;
+  }
 
-    public void setSynonymSchema(String synonymSchema) {
-        this.synonymSchema = synonymSchema;
-    }
+  public void setSynonymSchema(String synonymSchema) {
+    this.synonymSchema = synonymSchema;
+  }
 }

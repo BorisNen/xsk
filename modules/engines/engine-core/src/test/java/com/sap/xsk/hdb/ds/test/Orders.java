@@ -16,17 +16,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- * Class Orders
- *
- */
+/** Class Orders */
 @Table(name = "ORDERS")
 public class Orders {
-	
-	/** The id. */
-	@Id
-	@GeneratedValue
-	@Column(name = "KEY", columnDefinition = "VARCHAR", length=32, nullable = false)
-	private int id;
 
+  /** The id. */
+  @Id
+  @GeneratedValue
+  @Column(name = "KEY", columnDefinition = "VARCHAR", length = 32, nullable = false)
+  private int id;
 }

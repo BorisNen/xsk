@@ -44,59 +44,69 @@ import static org.mockito.Mockito.*;
 @PrepareForTest({SqlFactory.class, Configuration.class})
 public class HDBTableFunctionProcessorTest extends AbstractGuiceTest {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private Connection mockConnection;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private SqlFactory mockSqlfactory;
-    @Mock
-    private PreparedStatement mockStatement;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private Connection mockConnection;
 
-    @Before
-    public void openMocks() {
-        MockitoAnnotations.initMocks(this);
-    }
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private SqlFactory mockSqlfactory;
 
-    @Test
-    public void executeCreateTableFunctionSuccessfully() throws IOException, SQLException {
-        //PowerMock do not support deep stub calls
-        PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
-        when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
-        when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false")).thenReturn("true");
+  @Mock private PreparedStatement mockStatement;
 
-        HDBTableFunctionCreateProcessor processorSpy = spy(HDBTableFunctionCreateProcessor.class);
-        String hdbprocedureSample = org.apache.commons.io.IOUtils.toString(XSKViewParserTest.class.getResourceAsStream("/OrderTableFunction.hdbtablefunction"), StandardCharsets.UTF_8);
+  @Before
+  public void openMocks() {
+    MockitoAnnotations.initMocks(this);
+  }
 
-        XSKDataStructureHDBTableFunctionModel model = new XSKDataStructureHDBTableFunctionModel();
-        model.setContent(hdbprocedureSample);
-        model.setName("\"MYSCHEMA\".\"hdb_view::FUNCTION_NAME\"");
-        String sql = XSKConstants.XSK_HDBTABLEFUNCTION_CREATE + model.getContent();
-        when(SqlFactory.getNative(mockConnection).exists(mockConnection, model.getName(), DatabaseArtifactTypes.FUNCTION)).thenReturn(false);
+  @Test
+  public void executeCreateTableFunctionSuccessfully() throws IOException, SQLException {
+    // PowerMock do not support deep stub calls
+    PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
+    when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
+    when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"))
+        .thenReturn("true");
 
-        when(mockConnection.prepareStatement(sql)).thenReturn(mockStatement);
-        when(mockStatement.executeUpdate(any())).thenReturn(1);
-        processorSpy.execute(mockConnection, model);
+    HDBTableFunctionCreateProcessor processorSpy = spy(HDBTableFunctionCreateProcessor.class);
+    String hdbprocedureSample =
+        org.apache.commons.io.IOUtils.toString(
+            XSKViewParserTest.class.getResourceAsStream("/OrderTableFunction.hdbtablefunction"),
+            StandardCharsets.UTF_8);
 
-        verify(processorSpy, times(1)).executeSql(sql, mockConnection);
-    }
+    XSKDataStructureHDBTableFunctionModel model = new XSKDataStructureHDBTableFunctionModel();
+    model.setContent(hdbprocedureSample);
+    model.setName("\"MYSCHEMA\".\"hdb_view::FUNCTION_NAME\"");
+    String sql = XSKConstants.XSK_HDBTABLEFUNCTION_CREATE + model.getContent();
+    when(SqlFactory.getNative(mockConnection)
+            .exists(mockConnection, model.getName(), DatabaseArtifactTypes.FUNCTION))
+        .thenReturn(false);
 
-    @Test
-    public void executeDropTableFunctionSuccessfully() throws SQLException {
-        //PowerMock do not support deep stub calls
-        PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
-        when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
-        when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false")).thenReturn("true");
+    when(mockConnection.prepareStatement(sql)).thenReturn(mockStatement);
+    when(mockStatement.executeUpdate(any())).thenReturn(1);
+    processorSpy.execute(mockConnection, model);
 
-        HDBTableFunctionDropProcessor processorSpy = spy(HDBTableFunctionDropProcessor.class);
+    verify(processorSpy, times(1)).executeSql(sql, mockConnection);
+  }
 
-        XSKDataStructureHDBTableFunctionModel model = new XSKDataStructureHDBTableFunctionModel();
-        model.setName("\"MYSCHEMA\".\"hdb_view::FUNCTION_NAME\"");
-        String sql = XSKConstants.XSK_HDBTABLEFUNCTION_DROP + model.getName();
-        when(SqlFactory.getNative(mockConnection).exists(mockConnection, model.getName(), DatabaseArtifactTypes.FUNCTION)).thenReturn(true);
+  @Test
+  public void executeDropTableFunctionSuccessfully() throws SQLException {
+    // PowerMock do not support deep stub calls
+    PowerMockito.mockStatic(SqlFactory.class, Configuration.class);
+    when(SqlFactory.getNative(mockConnection)).thenReturn(mockSqlfactory);
+    when(Configuration.get(IDataStructureModel.DIRIGIBLE_DATABASE_NAMES_CASE_SENSITIVE, "false"))
+        .thenReturn("true");
 
-        when(mockConnection.prepareStatement(sql)).thenReturn(mockStatement);
-        when(mockStatement.executeUpdate(any())).thenReturn(1);
-        processorSpy.execute(mockConnection, model);
+    HDBTableFunctionDropProcessor processorSpy = spy(HDBTableFunctionDropProcessor.class);
 
-        verify(processorSpy, times(1)).executeSql(sql, mockConnection);
-    }
+    XSKDataStructureHDBTableFunctionModel model = new XSKDataStructureHDBTableFunctionModel();
+    model.setName("\"MYSCHEMA\".\"hdb_view::FUNCTION_NAME\"");
+    String sql = XSKConstants.XSK_HDBTABLEFUNCTION_DROP + model.getName();
+    when(SqlFactory.getNative(mockConnection)
+            .exists(mockConnection, model.getName(), DatabaseArtifactTypes.FUNCTION))
+        .thenReturn(true);
+
+    when(mockConnection.prepareStatement(sql)).thenReturn(mockStatement);
+    when(mockStatement.executeUpdate(any())).thenReturn(1);
+    processorSpy.execute(mockConnection, model);
+
+    verify(processorSpy, times(1)).executeSql(sql, mockConnection);
+  }
 }

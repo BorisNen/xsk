@@ -11,9 +11,6 @@
  */
 package com.sap.xsk.hdb.ds.model.hdbtable;
 
-/**
- * The Data Structure Table Constraint Primary Key Model.
- */
-public class XSKDataStructureHDBTableConstraintPrimaryKeyModel extends XSKDataStructureHDBTableConstraintModel {
-
-}
+/** The Data Structure Table Constraint Primary Key Model. */
+public class XSKDataStructureHDBTableConstraintPrimaryKeyModel
+    extends XSKDataStructureHDBTableConstraintModel {}
