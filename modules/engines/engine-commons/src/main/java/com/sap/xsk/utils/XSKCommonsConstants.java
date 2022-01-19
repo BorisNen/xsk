@@ -57,4 +57,5 @@ public final class XSKCommonsConstants {
     public static final String HDB_ENTITY_PROCESSOR = "HDB Entity";
     public static final String XSK_ENTITY_PROCESSOR = "XSK Entity";
     public static final String HDI_PROCESSOR = "HDI";
+    public static final String XSK_REGISTRY_PUBLIC = "/registry/public/";
 }
